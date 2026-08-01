@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gold: #D4AF37;
+  --gold-light: #e8c84e;
+  --dark: #0f0f0f;
+  --dark-card: #1a1a1a;
+  --dark-border: #2a2a2a;
+  --dark-surface: #141414;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--dark);
+  color: #f1f1f1;
+  font-family: 'Inter', 'Outfit', Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #111; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+/* ── Cinematic glow effects ── */
+.glow-gold {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.25), 0 0 60px rgba(212, 175, 55, 0.1);
+}
+
+.glow-gold-sm {
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+}
+
+/* ── Progress animations ── */
+@keyframes pulse-bar {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ── Film grain overlay ── */
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-2%, -3%); }
+  30% { transform: translate(3%, -1%); }
+  50% { transform: translate(-1%, 2%); }
+  70% { transform: translate(2%, 1%); }
+  90% { transform: translate(-3%, -2%); }
+}
+
+/* ── Fade in animation ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up {
+  animation: fadeUp 0.5s ease forwards;
+}
+
+/* ── Glass card ── */
+.glass-card {
+  background: rgba(26, 26, 26, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 16px;
+}
+
+/* ── Gold gradient text ── */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #D4AF37, #f0d060, #D4AF37);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Mood chip selected state ── */
+.mood-chip-selected {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: #D4AF37;
+  color: #D4AF37;
+}
+
+/* ── Video player ── */
+video {
+  border-radius: 12px;
+}
