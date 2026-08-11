@@ -31,7 +31,7 @@ Style: ${style}
 Mood(s): ${moodList}
 Language: ${language}
 Total Duration: ${duration} seconds
-Number of Scenes: ${Math.max(3, Math.ceil(duration / 20))}
+Number of Scenes: DYNAMIC (Create as many scenes as necessary to best tell the story. Each scene should have a natural duration between 5 and 20 seconds. The total durations must sum to approximately ${duration} seconds).
 
 Return ONLY this exact JSON structure (no markdown, no code fences):
 {
@@ -49,7 +49,7 @@ Return ONLY this exact JSON structure (no markdown, no code fences):
       "dialogue": [
         { "character": "Character Name", "text": "Dialogue line here" }
       ],
-      "visualPrompt": "Highly detailed cinematic scene description: setting, lighting, colors, camera angle, atmosphere, style. Suitable for image generation. Realistic, cinematic film still.",
+      "visualPrompt": "Highly detailed scene description: setting, lighting, colors, camera angle, atmosphere. Suitable for image generation. Must strictly match the requested style: ${style}.",
       "cameraMovement": "Slow dolly push in",
       "mood": "Suspense",
       "soundEffects": ["Rain pattering", "Distant thunder"],
@@ -60,8 +60,9 @@ Return ONLY this exact JSON structure (no markdown, no code fences):
 
 IMPORTANT:
 - All scene durations must add up to exactly ${duration} seconds
-- Narration must be in ${language}
-- Visual prompts must be in English regardless of story language
+- Regardless of what language the "Story Idea" is written in, the "title", "description", "narration", and "dialogue" MUST BE ENTIRELY translated to and written in ${language}. 
+- Do NOT mix languages. If ${language} is Hindi or Marathi, use the native Devanagari script exclusively.
+- Visual prompts MUST be strictly in English regardless of the story language.
 - Make the story compelling, dramatic, and cinematic
 - Return ONLY the JSON — nothing else`;
 };
@@ -110,53 +111,7 @@ const validateStoryJson = (data) => {
     return true;
 };
 
-/**
- * Fallback story generator when Gemini API is rate-limited, quota-exceeded, or offline.
- */
-const generateFallbackStory = (prompt, style, mood, language, duration) => {
-    const numScenes = Math.max(3, Math.ceil(duration / 20));
-    const sceneDuration = Math.round(duration / numScenes);
-    const moodList = Array.isArray(mood) ? mood.join(", ") : mood;
 
-    const title = prompt.length > 40 ? `${prompt.substring(0, 37)}...` : prompt;
-
-    const scenes = Array.from({ length: numScenes }, (_, i) => {
-        const isFirst = i === 0;
-        const isLast = i === numScenes - 1;
-        const currentDur = isLast ? duration - (sceneDuration * (numScenes - 1)) : sceneDuration;
-
-        let narration = "";
-        if (isFirst) {
-            narration = `The story opens with ${prompt.toLowerCase()}. An atmosphere of ${moodList.toLowerCase()} fills the scene.`;
-        } else if (isLast) {
-            narration = `In the final moments, the conflict surrounding ${prompt.toLowerCase()} reaches its dramatic climax.`;
-        } else {
-            narration = `As events unfold, the journey deepens. The struggle with ${prompt.toLowerCase()} intensifies.`;
-        }
-
-        return {
-            sceneNumber: i + 1,
-            duration: currentDur,
-            narration,
-            dialogue: [],
-            visualPrompt: `Cinematic film still, ${style} visual aesthetic, ${moodList} atmosphere. High detailed representation of: ${prompt}. Scene ${i + 1} of ${numScenes}. Cinematic lighting, 8k resolution, dramatic composition.`,
-            cameraMovement: i % 2 === 0 ? "Slow dolly push in" : "Wide tracking shot",
-            mood: Array.isArray(mood) ? mood[0] || "Drama" : mood,
-            soundEffects: ["Ambient wind", "Subtle dramatic tone"],
-            musicMood: style === "Thriller" ? "Dark tense pulse" : "Cinematic score",
-        };
-    });
-
-    return {
-        title,
-        description: `A ${style} story exploring ${prompt}.`,
-        language,
-        duration,
-        style,
-        mood: moodList,
-        scenes,
-    };
-};
 
 /**
  * Generate a structured story JSON from user input using Gemini
@@ -164,18 +119,16 @@ const generateFallbackStory = (prompt, style, mood, language, duration) => {
  */
 export const generateStory = async (prompt, style, mood, language, duration) => {
     const modelNames = [
-        "gemini-2.0-flash",
-        "gemini-2.0-flash-lite",
-        "gemini-1.5-flash",
-        "gemini-1.5-pro",
+        "gemini-flash-latest",
+        "gemini-2.5-flash"
     ];
 
     let client;
     try {
         client = getClient();
     } catch (e) {
-        console.warn(`⚠️ Gemini client error: ${e.message}. Using fallback story generator.`);
-        return generateFallbackStory(prompt, style, mood, language, duration);
+        console.error(`⚠️ Gemini client error: ${e.message}.`);
+        throw e;
     }
 
     let lastError;
@@ -208,6 +161,6 @@ export const generateStory = async (prompt, style, mood, language, duration) => 
         }
     }
 
-    console.warn(`⚠️ All Gemini models failed (${lastError?.message}). Using smart fallback story generator.`);
-    return generateFallbackStory(prompt, style, mood, language, duration);
+    console.error(`⚠️ All Gemini models failed (${lastError?.message}).`);
+    throw new Error(`Failed to generate story with Gemini: ${lastError?.message}`);
 };

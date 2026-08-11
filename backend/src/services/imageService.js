@@ -87,41 +87,38 @@ const createPurePngBuffer = (width, height, r = 30, g = 27, b = 75) => {
  * Generate an image for a scene visual prompt
  * @param {string} visualPrompt - The scene visual description
  * @param {string} outputPath - Absolute file path to save PNG
+ * @param {number} width - Image width
+ * @param {number} height - Image height
  * @returns {Promise<string>} outputPath on success
  */
-export const generateImage = async (visualPrompt, outputPath) => {
+export const generateImage = async (visualPrompt, outputPath, width = 1080, height = 1920) => {
     switch (PROVIDER) {
         case "pollinations":
-            return generateWithPollinations(visualPrompt, outputPath);
+            return generateWithPollinations(visualPrompt, outputPath, width, height);
         case "placeholder":
-            return generatePlaceholder(visualPrompt, outputPath);
+            return generatePlaceholder(visualPrompt, outputPath, width, height);
         default:
             console.warn(`⚠️ Unknown IMAGE_PROVIDER "${PROVIDER}". Falling back to placeholder.`);
-            return generatePlaceholder(visualPrompt, outputPath);
+            return generatePlaceholder(visualPrompt, outputPath, width, height);
     }
 };
 
 /**
  * Pollinations.ai — free AI image generation
  */
-const generateWithPollinations = async (visualPrompt, outputPath) => {
+const generateWithPollinations = async (visualPrompt, outputPath, width, height) => {
     const cleanPrompt = sanitizePromptForApi(visualPrompt);
     const encodedPrompt = encodeURIComponent(cleanPrompt);
-    const width = parseInt(process.env.VIDEO_WIDTH) || 1080;
-    const height = parseInt(process.env.VIDEO_HEIGHT) || 1920;
     const seed = Math.floor(Math.random() * 1000000);
     const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&nologo=true&seed=${seed}`;
 
     console.log(`🎨 Pollinations: Generating image... (${width}x${height})`);
 
     let lastError;
-    for (let attempt = 1; attempt <= 2; attempt++) {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout
-
+    // Retry up to 3 times if it fails
+    for (let attempt = 1; attempt <= 3; attempt++) {
         try {
             const response = await fetch(url, {
-                signal: controller.signal,
                 headers: { "User-Agent": "AIVideoGenerator/1.0" },
             });
             if (!response.ok) {
@@ -134,7 +131,6 @@ const generateWithPollinations = async (visualPrompt, outputPath) => {
             }
 
             const arrayBuffer = await response.arrayBuffer();
-            clearTimeout(timeoutId);
 
             const buffer = Buffer.from(arrayBuffer);
 
@@ -147,28 +143,23 @@ const generateWithPollinations = async (visualPrompt, outputPath) => {
             console.log(`✅ Pollinations: Image saved (${Math.round(buffer.length / 1024)}KB)`);
             return outputPath;
         } catch (error) {
-            clearTimeout(timeoutId);
             lastError = error;
-            const isAbort = error.name === "AbortError";
-            console.error(`❌ Pollinations attempt ${attempt} failed: ${isAbort ? "Request timed out after 12s" : error.message}`);
-            if (attempt < 2) {
-                await new Promise((r) => setTimeout(r, 1500));
+            console.error(`❌ Pollinations attempt ${attempt} failed: ${error.message}`);
+            if (attempt < 3) {
+                await new Promise((r) => setTimeout(r, 2000));
             }
         }
     }
 
     console.warn(`⚠️ Pollinations failed (${lastError?.message}). Creating native PNG placeholder image.`);
-    return generatePlaceholder(visualPrompt, outputPath);
+    return generatePlaceholder(visualPrompt, outputPath, width, height);
 };
 
 /**
- * Placeholder — generates a full 1080x1920 PNG binary file instantly via pure native Node.js
+ * Placeholder — generates a full PNG binary file instantly via pure native Node.js
  * Guaranteed to succeed in 10ms with zero network/process dependencies
  */
-const generatePlaceholder = async (visualPrompt, outputPath) => {
-    const width = parseInt(process.env.VIDEO_WIDTH) || 1080;
-    const height = parseInt(process.env.VIDEO_HEIGHT) || 1920;
-
+const generatePlaceholder = async (visualPrompt, outputPath, width, height) => {
     try {
         const pngBuffer = createPurePngBuffer(width, height, 26, 24, 60);
         fs.writeFileSync(outputPath, pngBuffer);

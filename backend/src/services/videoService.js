@@ -7,6 +7,7 @@ import {
     createSceneVideo,
     concatenateSceneVideos,
     addMusicAndSubtitles,
+    getMediaDuration,
 } from "./ffmpegService.js";
 import {
     createProjectStructure,
@@ -42,6 +43,19 @@ export const runVideoPipeline = async (projectId, storyData) => {
     const language = storyData.language || "English";
     const sceneVideoPaths = [];
 
+    // Fetch project to get format
+    const project = await AiVideoProject.findByPk(projectId);
+    const format = project?.format || "9:16";
+    let videoWidth = 1080;
+    let videoHeight = 1920; // Default 9:16 (Shorts/Reels)
+    if (format === "16:9") {
+        videoWidth = 1920;
+        videoHeight = 1080;
+    } else if (format === "1:1") {
+        videoWidth = 1080;
+        videoHeight = 1080;
+    }
+
     try {
         // ── STEP 1: Ensure project folder structure exists
         createProjectStructure(projectId);
@@ -58,7 +72,7 @@ export const runVideoPipeline = async (projectId, storyData) => {
                 console.log(`⏭️  Skipping image for scene ${scene.sceneNumber} (already exists)`);
             } else {
                 try {
-                    await generateImage(scene.visualPrompt, paths.image);
+                    await generateImage(scene.visualPrompt, paths.image, videoWidth, videoHeight);
                 } catch (imgErr) {
                     console.error(`❌ Image gen failed for scene ${scene.sceneNumber}: ${imgErr.message}`);
                     // Continue — placeholder will be used
@@ -103,7 +117,7 @@ export const runVideoPipeline = async (projectId, storyData) => {
             const scene = scenes[i];
             const paths = getScenePaths(projectId, scene.sceneNumber);
             const effect = scene.cinematicEffect || getCinematicEffect(i);
-            const duration = scene.duration || 10;
+            let duration = scene.duration || 10;
 
             // Verify source files exist
             if (!fileExists(paths.image)) {
@@ -115,12 +129,23 @@ export const runVideoPipeline = async (projectId, storyData) => {
                 continue;
             }
 
+            // Dynamically adjust duration to strictly match audio length
+            try {
+                const audioLen = await getMediaDuration(paths.audio);
+                if (audioLen > 0) {
+                    // Make scene exactly as long as audio + 0.5s padding (min 3s)
+                    duration = Math.max(3, Math.ceil(audioLen * 10) / 10 + 0.5);
+                }
+            } catch (err) {
+                console.warn(`⚠️  Could not probe audio duration for scene ${scene.sceneNumber}`);
+            }
+
             if (fileExists(paths.video)) {
                 console.log(`⏭️  Skipping video for scene ${scene.sceneNumber} (already exists)`);
                 sceneVideoPaths.push(paths.video);
             } else {
                 try {
-                    await createSceneVideo(paths.image, paths.audio, duration, paths.video, effect);
+                    await createSceneVideo(paths.image, paths.audio, duration, paths.video, effect, videoWidth, videoHeight);
                     sceneVideoPaths.push(paths.video);
                 } catch (videoErr) {
                     console.error(`❌ Scene video failed for scene ${scene.sceneNumber}: ${videoErr.message}`);

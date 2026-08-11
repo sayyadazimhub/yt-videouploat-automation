@@ -40,7 +40,7 @@ export const getScenePaths = (projectId, sceneNumber) => {
     return {
         json: path.join(base, "scenes", `scene-${num}.json`),
         image: path.join(base, "images", `scene-${num}.png`),
-        audio: path.join(base, "audio", `scene-${num}.wav`),
+        audio: path.join(base, "audio", `scene-${num}.mp3`),
         video: path.join(base, "scenes-video", `scene-${num}.mp4`),
     };
 };

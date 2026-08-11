@@ -4,6 +4,7 @@ import fs from "fs";
 import dotenv from "dotenv";
 
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
+import ffprobeInstaller from "@ffprobe-installer/ffprobe";
 
 dotenv.config();
 
@@ -16,8 +17,11 @@ if (process.env.FFMPEG_PATH && fs.existsSync(process.env.FFMPEG_PATH)) {
     console.log(`🎬 FFmpeg: Using auto-installer path → ${ffmpegInstaller.path}`);
 }
 
-const VIDEO_WIDTH = parseInt(process.env.VIDEO_WIDTH) || 1080;
-const VIDEO_HEIGHT = parseInt(process.env.VIDEO_HEIGHT) || 1920;
+if (ffprobeInstaller?.path) {
+    ffmpeg.setFfprobePath(ffprobeInstaller.path);
+    console.log(`🎬 FFprobe: Using auto-installer path → ${ffprobeInstaller.path}`);
+}
+
 const NARRATION_VOLUME = parseFloat(process.env.NARRATION_VOLUME) || 1.0;
 const MUSIC_VOLUME = parseFloat(process.env.MUSIC_VOLUME) || 0.2;
 
@@ -69,9 +73,11 @@ const buildVideoFilter = (effect, duration, width, height) => {
  * @param {number} duration - Scene duration in seconds
  * @param {string} outputPath - Output MP4 path
  * @param {string} effect - Cinematic motion effect name
+ * @param {number} width - Output video width
+ * @param {number} height - Output video height
  */
-export const createSceneVideo = async (imagePath, audioPath, duration, outputPath, effect = "zoom_in") => {
-    const videoFilter = buildVideoFilter(effect, duration, VIDEO_WIDTH, VIDEO_HEIGHT);
+export const createSceneVideo = async (imagePath, audioPath, duration, outputPath, effect = "zoom_in", width = 1080, height = 1920) => {
+    const videoFilter = buildVideoFilter(effect, duration, width, height);
 
     const command = ffmpeg()
         .input(imagePath)
@@ -207,11 +213,11 @@ export const addMusicAndSubtitles = async (videoPath, musicPath, subtitlePath, o
 };
 
 /**
- * Get duration of a video file in seconds
+ * Get duration of a media file (video or audio) in seconds
  */
-export const getVideoDuration = (videoPath) => {
+export const getMediaDuration = (filePath) => {
     return new Promise((resolve, reject) => {
-        ffmpeg.ffprobe(videoPath, (err, metadata) => {
+        ffmpeg.ffprobe(filePath, (err, metadata) => {
             if (err) reject(err);
             else resolve(metadata.format.duration || 0);
         });

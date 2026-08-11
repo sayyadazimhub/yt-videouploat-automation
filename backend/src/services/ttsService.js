@@ -1,25 +1,24 @@
-import say from "say";
+import { MsEdgeTTS, OUTPUT_FORMAT } from "msedge-tts";
 import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const PROVIDER = process.env.TTS_PROVIDER || "say";
-
 /**
- * Language to OS voice mapping
+ * Language to Microsoft Edge Neural Voice mapping
+ * Using the most expressive, cinematic narrator voices available.
  */
 const LANGUAGE_VOICE_MAP = {
-    English: null,          // use OS default
-    Hindi: null,            // Windows SAPI: may need Hindi TTS pack
-    Marathi: null,          // Windows SAPI: may need Marathi TTS pack
+    English: "en-US-ChristopherNeural", // Deep, cinematic male narrator
+    Hindi: "hi-IN-MadhurNeural",        // Professional Hindi male
+    Marathi: "mr-IN-ManoharNeural",     // Professional Marathi male
 };
 
 /**
- * Generate audio narration for a scene
+ * Generate audio narration for a scene using google-tts-api
  * @param {string} narration - Text to speak
- * @param {string} outputPath - Absolute .wav file path
+ * @param {string} outputPath - Absolute .mp3 file path
  * @param {string} language - Language name
  * @returns {Promise<string>} outputPath on success
  */
@@ -29,56 +28,70 @@ export const generateAudio = async (narration, outputPath, language = "English")
         return createSilentAudio(outputPath);
     }
 
-    switch (PROVIDER) {
-        case "say":
-            return generateWithSay(narration, outputPath, language);
-        case "silent":
-            return createSilentAudio(outputPath);
-        default:
-            console.warn(`⚠️  Unknown TTS_PROVIDER "${PROVIDER}". Using OS TTS.`);
-            return generateWithSay(narration, outputPath, language);
-    }
-};
-
-/**
- * OS native TTS via `say` npm package
- * Windows: SAPI | macOS: say | Linux: espeak
- */
-const generateWithSay = (narration, outputPath, language) => {
-    return new Promise((resolve, reject) => {
-        const voice = LANGUAGE_VOICE_MAP[language] || null;
-        const speed = 0.9; // Slightly slower for cinematic narration
-
-        console.log(`🎙️  TTS (say): Generating audio for "${narration.substring(0, 40)}..."`);
+    return new Promise(async (resolve, reject) => {
+        const voiceName = LANGUAGE_VOICE_MAP[language] || "en-US-ChristopherNeural";
+        
+        console.log(`🎙️  TTS (Edge Neural): Generating expressive audio for "${narration.substring(0, 40)}..." in ${language} (${voiceName})`);
 
         let handled = false;
         const timer = setTimeout(() => {
             if (!handled) {
                 handled = true;
-                console.warn("⚠️  TTS (say) timed out after 10s. Falling back to silent audio.");
+                console.warn("⚠️  TTS (Edge) timed out after 30s. Falling back to silent audio.");
                 createSilentAudio(outputPath).then(resolve).catch(reject);
             }
-        }, 10000);
+        }, 30000);
 
-        say.export(narration, voice, speed, outputPath, (err) => {
+        try {
+            const tts = new MsEdgeTTS();
+            await tts.setMetadata(voiceName, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
+            
+            if (handled) return;
+
+            // Generate directly to file via stream to allow exact file naming
+            const { audioStream } = tts.toStream(narration);
+            const writeStream = fs.createWriteStream(outputPath);
+            
+            audioStream.pipe(writeStream);
+
+            writeStream.on("finish", () => {
+                if (handled) return;
+                handled = true;
+                clearTimeout(timer);
+                console.log(`✅ TTS: Cinematic audio saved → ${path.basename(outputPath)}`);
+                resolve(outputPath);
+            });
+
+            writeStream.on("error", (err) => {
+                if (handled) return;
+                handled = true;
+                clearTimeout(timer);
+                console.error(`❌ TTS file write error: ${err.message}`);
+                console.warn("⚠️  Falling back to silent audio");
+                createSilentAudio(outputPath).then(resolve).catch(reject);
+            });
+
+            audioStream.on("error", (err) => {
+                if (handled) return;
+                handled = true;
+                clearTimeout(timer);
+                console.error(`❌ TTS stream error: ${err.message}`);
+                console.warn("⚠️  Falling back to silent audio");
+                createSilentAudio(outputPath).then(resolve).catch(reject);
+            });
+        } catch (err) {
             if (handled) return;
             handled = true;
             clearTimeout(timer);
-
-            if (err) {
-                console.error(`❌ TTS say error: ${err.message}`);
-                console.warn("⚠️  Falling back to silent audio");
-                createSilentAudio(outputPath).then(resolve).catch(reject);
-            } else {
-                console.log(`✅ TTS: Audio saved → ${path.basename(outputPath)}`);
-                resolve(outputPath);
-            }
-        });
+            console.error(`❌ TTS Edge Neural error: ${err.message}`);
+            console.warn("⚠️  Falling back to silent audio");
+            createSilentAudio(outputPath).then(resolve).catch(reject);
+        }
     });
 };
 
 /**
- * Creates a minimal silent WAV file
+ * Creates a minimal silent WAV file (Even though extension might be .mp3, FFmpeg handles the mismatch gracefully)
  * Ensures FFmpeg always has an audio input even if TTS fails
  */
 const createSilentAudio = async (outputPath, durationSeconds = 10) => {
