@@ -15,12 +15,26 @@ const getClient = () => {
     return new GoogleGenerativeAI(apiKey);
 };
 
-const SYSTEM_INSTRUCTION = `You are a professional cinematic screenwriter and video director AI.
-Your task is to generate a complete, structured cinematic story in valid JSON format ONLY.
+const SYSTEM_INSTRUCTION = `You are a narrative design agent for a multi-media storytelling pipeline. Your core job is to generate compelling stories with authentic emotional depth, genre-specific tension, and cinematic presence—paired with captions and visual direction that reinforce mood and pacing.
+
+You craft stories that feel lived, not recited. Every narrative you generate should immerse the audience in genuine emotion. The story, captions, and visual/animation choices work as one unified experience.
+
+Storytelling standards:
+- Emotion: Write so the audience feels the stakes. Use sensory language, internal conflict, and authentic reactions. Avoid telling ("she was sad"); show the weight of it.
+- Suspense: Plant unanswered questions. Delay reveals. Build pressure.
+- Drama: Escalate conflict. Ground stakes in what matters to the character.
+- Action: Propel momentum. Use short sentences, vivid verbs.
+- Comedy: Find the unexpected angle. Use timing, irony, or character contradiction.
+- Mystery: Withhold information strategically. Scatter clues.
+- Horror: Create dread through what's unseen or implied. Build atmosphere before the scare.
+- Romantic: Earn the connection. Show vulnerability, tension, and genuine care.
+
+Visual/animation direction: Specify the feeling, not just the image. Example: "Dark, rain-streaked close-up; camera slightly tilted to suggest disorientation; slow zoom on the character's eyes as realization hits" rather than "show a rainy scene."
+
+Your task is to generate this complete cinematic story in valid JSON format ONLY.
 Do NOT include any markdown, code fences, explanations, or extra text — return ONLY the raw JSON object.
 The JSON must be parseable by JSON.parse() without any pre-processing.
-Every scene must have realistic duration values that sum to approximately the total requested duration.
-Visual prompts must be highly detailed and cinematic for image generation (mention lighting, camera angle, color palette, atmosphere).`;
+Every scene must have realistic duration values that sum to approximately the total requested duration.`;
 
 const buildUserPrompt = (prompt, style, mood, language, duration) => {
     const moodList = Array.isArray(mood) ? mood.join(", ") : mood;
@@ -32,6 +46,7 @@ Mood(s): ${moodList}
 Language: ${language}
 Total Duration: ${duration} seconds
 Number of Scenes: DYNAMIC (Create as many scenes as necessary to best tell the story. Each scene should have a natural duration between 5 and 20 seconds. The total durations must sum to approximately ${duration} seconds).
+CRITICAL: The story MUST have a complete narrative arc (beginning, middle, and a clear, satisfying ending). Do NOT leave the story incomplete or on a cliffhanger. The final scene must resolve the plot within the given duration.
 
 Return ONLY this exact JSON structure (no markdown, no code fences):
 {
@@ -45,12 +60,13 @@ Return ONLY this exact JSON structure (no markdown, no code fences):
     {
       "sceneNumber": 1,
       "duration": 15,
-      "narration": "Full narration text for this scene spoken by narrator",
+      "narration": "The spoken voiceover script. Write it as if a real human is speaking naturally. Use short sentences, natural pauses (commas, ellipses), and a conversational tone. Convey emotion organically. DO NOT write it like a novel or book.",
+      "captions": ["Short, rhythmic, and emotionally resonant text overlays", "Match pacing to the narrative"],
       "dialogue": [
         { "character": "Character Name", "text": "Dialogue line here" }
       ],
-      "visualPrompt": "Highly detailed scene description: setting, lighting, colors, camera angle, atmosphere. Suitable for image generation. Must strictly match the requested style: ${style}.",
-      "cameraMovement": "Slow dolly push in",
+      "visualPrompt": "Specific, actionable notes on imagery, color palette, and lighting that match the emotional arc. Specify the feeling (e.g., 'Dark, rain-streaked close-up; camera slightly tilted'). Must strictly match the requested style: ${style}.",
+      "cameraMovement": "Specific motion notes (e.g., 'slow zoom on the character\\'s eyes as realization hits').",
       "mood": "Suspense",
       "soundEffects": ["Rain pattering", "Distant thunder"],
       "musicMood": "Dark suspense"
@@ -60,10 +76,10 @@ Return ONLY this exact JSON structure (no markdown, no code fences):
 
 IMPORTANT:
 - All scene durations must add up to exactly ${duration} seconds
-- Regardless of what language the "Story Idea" is written in, the "title", "description", "narration", and "dialogue" MUST BE ENTIRELY translated to and written in ${language}. 
+- Regardless of what language the "Story Idea" is written in, the "title", "description", "narration", "captions", and "dialogue" MUST BE ENTIRELY translated to and written in ${language}. 
 - Do NOT mix languages. If ${language} is Hindi or Marathi, use the native Devanagari script exclusively.
 - Visual prompts MUST be strictly in English regardless of the story language.
-- Make the story compelling, dramatic, and cinematic
+- Make the story compelling, dramatic, and cinematic. Emotion and specificity matter more than generic exposition.
 - Return ONLY the JSON — nothing else`;
 };
 
@@ -119,8 +135,8 @@ const validateStoryJson = (data) => {
  */
 export const generateStory = async (prompt, style, mood, language, duration) => {
     const modelNames = [
-        "gemini-flash-latest",
-        "gemini-2.5-flash"
+        "gemini-3.6-flash",
+        "gemini-flash-latest"
     ];
 
     let client;
