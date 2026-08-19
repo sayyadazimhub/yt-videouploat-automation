@@ -1,0 +1,24 @@
+{
+  "sceneNumber": 2,
+  "duration": 10,
+  "narration": "तभी स्क्रीन लाल हो गई! एक घातक 'सिस्टम एरर' का अलर्ट चमका!",
+  "dialogue": [
+    {
+      "character": "कबीर",
+      "text": "अरे बाप रे! डेटा क्रैश हो गया! कॉफ़ी भी गिर गई!"
+    },
+    {
+      "character": "रोहन",
+      "text": "घबराओ मत! कबीर, बैकअप संभालो! प्रिया, लॉग्ज चेक करो!"
+    }
+  ],
+  "visualPrompt": "Dramatic action shot in a dark office, bright red error glow illuminating three panicked developers, a coffee cup spilling in dramatic slow motion, dynamic cinematic camera angle, vivid red and blue contrasts, comedic action mood, intense motion blur.",
+  "cameraMovement": "Fast whip-pan and sharp zoom into the red monitor screen",
+  "mood": "Action",
+  "soundEffects": [
+    "Loud system error beep",
+    "Liquid splashing sound",
+    "Dramatic cinematic swoosh"
+  ],
+  "musicMood": "Fast-paced orchestral action beat"
+}

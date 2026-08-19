@@ -1,0 +1,20 @@
+{
+  "sceneNumber": 1,
+  "duration": 8,
+  "narration": "शाम के वक्त जल्दबाज़ी में एक अमीर ग्राहक दुकान से गलत डिब्बा लेकर निकल गया।",
+  "dialogue": [
+    {
+      "character": "दुकानदार",
+      "text": "अरे नहीं! ये तो असली गहनों वाला डिब्बा चला गया!"
+    }
+  ],
+  "visualPrompt": "A modest small Indian corner shop during golden hour dusk. A distressed middle-aged Indian shopkeeper looking frantically at an open empty shelf while a black luxury sedan speeds away in the soft-focus background street. Warm oil lamp lighting mixed with blue evening twilight, cinematic color grading, dramatic depth of field.",
+  "cameraMovement": "Fast whip-pan from shop counter to speeding car",
+  "mood": "Suspense",
+  "soundEffects": [
+    "Car engine accelerating",
+    "Gasping breath",
+    "Shop bell ringing"
+  ],
+  "musicMood": "Fast rhythmic suspenseful strings"
+}

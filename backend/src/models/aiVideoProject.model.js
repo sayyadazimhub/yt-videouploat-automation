@@ -76,6 +76,43 @@ const AiVideoProject = sequelize.define(
             type: DataTypes.TEXT,
             allowNull: true,
         },
+        youtube_video_id: {
+            type: DataTypes.STRING(255),
+            allowNull: true,
+        },
+        youtube_url: {
+            type: DataTypes.STRING(500),
+            allowNull: true,
+        },
+        youtube_status: {
+            type: DataTypes.ENUM(
+                "NOT_STARTED",
+                "AUTH_REQUIRED",
+                "UPLOADING",
+                "PROCESSING",
+                "COMPLETED",
+                "FAILED"
+            ),
+            allowNull: true,
+            defaultValue: "NOT_STARTED",
+        },
+        youtube_privacy_status: {
+            type: DataTypes.STRING(50),
+            allowNull: true,
+            defaultValue: "private",
+        },
+        youtube_title: {
+            type: DataTypes.STRING(255),
+            allowNull: true,
+        },
+        youtube_description: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+        },
+        youtube_uploaded_at: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
     },
     {
         tableName: "ai_video_projects",

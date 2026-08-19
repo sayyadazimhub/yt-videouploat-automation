@@ -43,4 +43,21 @@ export const deleteProject = (projectId) =>
 export const getMediaUrl = (relativePath) =>
   `${API_URL}${relativePath}`;
 
+// ── YouTube APIs ──────────────────────────────────────────
+
+export const getYouTubeStatus = () =>
+  api.get("/youtube/status");
+
+export const disconnectYouTube = () =>
+  api.post("/youtube/disconnect");
+
+export const generateYouTubeMetadata = (projectId) =>
+  api.post("/youtube/metadata", { projectId });
+
+export const uploadToYouTube = (data) =>
+  api.post("/youtube/upload", data);
+
+export const getYouTubeUploadStatus = (projectId) =>
+  api.get(`/youtube/upload-status/${projectId}`);
+
 export default api;

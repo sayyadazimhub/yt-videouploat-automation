@@ -3,12 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getProjects, getMediaUrl, deleteProject } from "../../utils/api";
-import { Film, Trash2, ArrowLeft, Loader2, Play } from "lucide-react";
+import { Film, Trash2, ArrowLeft, Loader2, Play, Youtube, X } from "lucide-react";
 import toast from "react-hot-toast";
+import YouTubeSection from "../../components/youtube/YouTubeSection";
 
 export default function GalleryPage() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [uploadingProject, setUploadingProject] = useState(null);
 
   useEffect(() => {
     fetchProjects();
@@ -115,13 +117,37 @@ export default function GalleryPage() {
                       {project.style}
                     </span>
                     
-                    <button
-                      onClick={() => handleDelete(project.id)}
-                      className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded transition-colors"
-                      title="Delete Video"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {project.youtube_status === "COMPLETED" && project.youtube_url ? (
+                        <a 
+                          href={project.youtube_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded text-xs font-bold transition-colors"
+                          title="Watch on YouTube"
+                        >
+                          <Youtube size={14} />
+                          YouTube
+                        </a>
+                      ) : (
+                        <button
+                          onClick={() => setUploadingProject(project)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-[#D4AF37]/10 text-[#D4AF37] hover:bg-[#D4AF37]/20 rounded text-xs font-bold transition-colors"
+                          title="Upload to YouTube"
+                        >
+                          <Youtube size={14} />
+                          Upload
+                        </button>
+                      )}
+                      
+                      <button
+                        onClick={() => handleDelete(project.id)}
+                        className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded transition-colors"
+                        title="Delete Video"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -129,6 +155,32 @@ export default function GalleryPage() {
           </div>
         )}
       </div>
+
+      {/* YouTube Upload Modal */}
+      {uploadingProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-[#0f0f0f] border border-[#2a2a2a] rounded-2xl shadow-2xl overflow-hidden my-8">
+            <div className="flex items-center justify-between p-4 border-b border-[#2a2a2a] bg-[#141414] sticky top-0 z-10">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Youtube className="text-red-500" />
+                Upload "{uploadingProject.title}" to YouTube
+              </h2>
+              <button 
+                onClick={() => setUploadingProject(null)}
+                className="p-2 text-slate-400 hover:text-white bg-[#1a1a1a] hover:bg-[#2a2a2a] rounded-full transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-4 max-h-[70vh] overflow-y-auto">
+              <YouTubeSection 
+                projectId={uploadingProject.id} 
+                initialYouTubeStatus={uploadingProject.youtube_status || "NOT_STARTED"} 
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

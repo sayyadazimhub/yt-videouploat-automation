@@ -1,0 +1,24 @@
+{
+  "sceneNumber": 3,
+  "duration": 10,
+  "narration": "लाल बत्ती पर कार रुकते ही उसने हाँपते हुए सही डिब्बा साहब के हाथों में थमा दिया।",
+  "dialogue": [
+    {
+      "character": "अमीर ग्राहक",
+      "text": "तुम इस ज़रा से डिब्बे के लिए इतनी दूर भागते हुए आए?"
+    },
+    {
+      "character": "दुकानदार",
+      "text": "सामान छोटा हो सकता है साहब, मेरी नीयत नहीं।"
+    }
+  ],
+  "visualPrompt": "Close-up cinematic shot through a rolled-down luxury car window. A wealthy man in a tailored suit looks astonished as the breathless, sweating shopkeeper hands him a small velvet box under streetlamp glow. Soft golden streetlight bokeh background, emotional warmth, 35mm film render.",
+  "cameraMovement": "Slow dolly push in to close-up of hands exchanging box",
+  "mood": "Emotional",
+  "soundEffects": [
+    "Car window rolling down",
+    "Soft evening breeze",
+    "Gentle sigh"
+  ],
+  "musicMood": "Warm uplifting emotional piano resolution"
+}

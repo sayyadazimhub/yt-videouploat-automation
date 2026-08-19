@@ -1,0 +1,24 @@
+{
+  "sceneNumber": 1,
+  "duration": 10,
+  "narration": "रात के दो बजे हैं, और यह प्रोजेक्ट ही इन तीनों डेवलपर्स की आखिरी उम्मीद है।",
+  "dialogue": [
+    {
+      "character": "प्रिया",
+      "text": "रोहन, सिर्फ दस मिनट बचे हैं! क्या डिप्लॉयमेंट तैयार है?"
+    },
+    {
+      "character": "रोहन",
+      "text": "कोड तैयार है, बस अंतिम टेस्ट रन कर रहा हूँ..."
+    }
+  ],
+  "visualPrompt": "A dimly lit modern tech office at night, three exhausted software developers huddled around glowing dual monitors, neon blue and warm tungsten lighting, dramatic camera angle, shallow depth of field, cinematic close-up shots of nervous faces and rapid typing on mechanical keyboards, tense atmosphere.",
+  "cameraMovement": "Slow tracking dolly push-in",
+  "mood": "Drama",
+  "soundEffects": [
+    "Rapid keyboard clacking",
+    "Office AC humming",
+    "Clock ticking fast"
+  ],
+  "musicMood": "Intense rhythmic synth pulse"
+}

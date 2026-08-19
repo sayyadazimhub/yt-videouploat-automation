@@ -1,0 +1,74 @@
+{
+  "title": "कीमती भूल",
+  "description": "एक छोटे दुकानदार से गलती से एक अमीर ग्राहक को कीमती आभूषण का डिब्बा चला जाता है। अपनी ईमानदारी और फर्ज की खातिर वह पूरे शहर में उस कार का पीछा करता है।",
+  "language": "Hindi",
+  "duration": 30,
+  "style": "Cinematic",
+  "mood": "Drama",
+  "scenes": [
+    {
+      "sceneNumber": 1,
+      "duration": 8,
+      "narration": "शाम के वक्त जल्दबाज़ी में एक अमीर ग्राहक दुकान से गलत डिब्बा लेकर निकल गया।",
+      "dialogue": [
+        {
+          "character": "दुकानदार",
+          "text": "अरे नहीं! ये तो असली गहनों वाला डिब्बा चला गया!"
+        }
+      ],
+      "visualPrompt": "A modest small Indian corner shop during golden hour dusk. A distressed middle-aged Indian shopkeeper looking frantically at an open empty shelf while a black luxury sedan speeds away in the soft-focus background street. Warm oil lamp lighting mixed with blue evening twilight, cinematic color grading, dramatic depth of field.",
+      "cameraMovement": "Fast whip-pan from shop counter to speeding car",
+      "mood": "Suspense",
+      "soundEffects": [
+        "Car engine accelerating",
+        "Gasping breath",
+        "Shop bell ringing"
+      ],
+      "musicMood": "Fast rhythmic suspenseful strings"
+    },
+    {
+      "sceneNumber": 2,
+      "duration": 12,
+      "narration": "भीड़भाड़ और ट्रैफ़िक की परवाह किए बिना, दुकानदार अपनी पूरी ताकत से कार के पीछे भागने लगा।",
+      "dialogue": [
+        {
+          "character": "दुकानदार",
+          "text": "रुकिए साहब! आपका सामान छूट गया है!"
+        }
+      ],
+      "visualPrompt": "Dynamic side-tracking shot of an exhausted Indian shopkeeper running furiously through a densely packed, neon-lit city street at dusk. Motion blur of autorickshaws and yellow taxis around him, rain-slicked pavement reflecting bright urban lights, intense dramatic facial expression, movie-like aesthetic.",
+      "cameraMovement": "Dynamic tracking shot moving alongside the runner",
+      "mood": "Urgent",
+      "soundEffects": [
+        "Traffic horns honking",
+        "Heavy panting feet stomping",
+        "City ambient chatter"
+      ],
+      "musicMood": "High-tempo dramatic orchestra buildup"
+    },
+    {
+      "sceneNumber": 3,
+      "duration": 10,
+      "narration": "लाल बत्ती पर कार रुकते ही उसने हाँपते हुए सही डिब्बा साहब के हाथों में थमा दिया।",
+      "dialogue": [
+        {
+          "character": "अमीर ग्राहक",
+          "text": "तुम इस ज़रा से डिब्बे के लिए इतनी दूर भागते हुए आए?"
+        },
+        {
+          "character": "दुकानदार",
+          "text": "सामान छोटा हो सकता है साहब, मेरी नीयत नहीं।"
+        }
+      ],
+      "visualPrompt": "Close-up cinematic shot through a rolled-down luxury car window. A wealthy man in a tailored suit looks astonished as the breathless, sweating shopkeeper hands him a small velvet box under streetlamp glow. Soft golden streetlight bokeh background, emotional warmth, 35mm film render.",
+      "cameraMovement": "Slow dolly push in to close-up of hands exchanging box",
+      "mood": "Emotional",
+      "soundEffects": [
+        "Car window rolling down",
+        "Soft evening breeze",
+        "Gentle sigh"
+      ],
+      "musicMood": "Warm uplifting emotional piano resolution"
+    }
+  ]
+}

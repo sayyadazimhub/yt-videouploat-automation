@@ -3,7 +3,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { dbconnected } from "./config/db.js";
 import aiVideoRoute from "./routes/aiVideo.route.js";
+import youtubeRoute from "./routes/youtube.route.js";
 import AiVideoProject from "./models/aiVideoProject.model.js";
+import YoutubeAccount from "./models/youtubeAccount.model.js";
 import { runVideoPipeline } from "./services/videoService.js";
 import { Op } from "sequelize";
 
@@ -31,6 +33,7 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api", aiVideoRoute);
+app.use("/api", youtubeRoute);
 
 // Global error handler
 app.use((err, req, res, next) => {

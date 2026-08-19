@@ -9,6 +9,7 @@ import {
   getMediaUrl,
   deleteProject,
 } from "../../utils/api";
+import YouTubeSection from "../../components/youtube/YouTubeSection";
 import {
   Film,
   Sparkles,
@@ -804,6 +805,11 @@ export default function AiVideoPage() {
                       Create Another Video
                     </OutlineButton>
                   </div>
+                )}
+
+                {/* YouTube Upload Integration */}
+                {videoUrl && statusData?.status === "COMPLETED" && (
+                    <YouTubeSection projectId={projectId} />
                 )}
 
                 {/* Waiting state */}
