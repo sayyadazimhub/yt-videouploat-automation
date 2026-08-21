@@ -8,14 +8,22 @@
  * @param {string} style - Story style
  * @returns {Array} Enriched scene objects
  */
-export const buildScenes = (scenes, style) => {
+export const buildScenes = (scenes, style, mood) => {
     return scenes.map((scene, index) => ({
         ...scene,
         sceneNumber: scene.sceneNumber || index + 1,
         duration: scene.duration || 10,
+        storyBeat: scene.storyBeat || "",
+        location: scene.location || "",
+        charactersInScene: scene.charactersInScene || [],
+        currentSceneState: scene.currentSceneState || "",
+        previousSceneState: scene.previousSceneState || "",
+        nextSceneHint: scene.nextSceneHint || "",
+        continuityNotes: scene.continuityNotes || "",
         narration: scene.narration || "",
         dialogue: scene.dialogue || [],
-        visualPrompt: enrichVisualPrompt(scene.visualPrompt || "", style),
+        visualBeats: scene.visualBeats || [],
+        visualPrompt: enrichVisualPrompt(scene.visualPrompt || "", style, mood),
         cameraMovement: scene.cameraMovement || getDefaultCameraMove(index),
         mood: scene.mood || "Dramatic",
         soundEffects: scene.soundEffects || [],
@@ -27,16 +35,19 @@ export const buildScenes = (scenes, style) => {
 /**
  * Enrich visual prompt with cinematic quality tags
  */
-const enrichVisualPrompt = (prompt, style) => {
-    const styleTag =
-        style === "Anime"
-            ? "anime style, detailed illustration"
-            : style === "Documentary"
-            ? "documentary style, realistic photography"
-            : "cinematic film still, photorealistic, dramatic lighting";
+const enrichVisualPrompt = (prompt, mood) => {
+    // Since the pipeline is permanently locked to the Storytelling format,
+    // we hardcode the illustrative high-quality aesthetic tag.
+    const styleTag = "storybook illustration, rich colors, expressive, high quality concept art, 4k";
 
-    if (prompt.toLowerCase().includes("cinematic")) return prompt;
-    return `${prompt}, ${styleTag}, 4K, high quality, detailed`;
+    let moodTag = "";
+    if (mood) {
+        // Mood can be a comma-separated list like "Suspense, Mystery"
+        moodTag = `${mood} atmosphere, `;
+    }
+
+    // Always append the strong style and mood tags to ensure Pollinations enforces the requested aesthetic
+    return `${prompt.trim()}, ${moodTag}${styleTag}`;
 };
 
 /**

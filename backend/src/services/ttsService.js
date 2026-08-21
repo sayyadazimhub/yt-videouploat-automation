@@ -2,36 +2,92 @@ import { MsEdgeTTS, OUTPUT_FORMAT } from "msedge-tts";
 import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
+import { concatenateAudioFiles } from "./ffmpegService.js";
 
 dotenv.config();
 
 /**
- * Language to Microsoft Edge Neural Voice mapping
- * Using the most expressive, cinematic narrator voices available.
+ * Language to Microsoft Edge Neural Voice mapping for Narration
  */
 const LANGUAGE_VOICE_MAP = {
-    English: "en-US-ChristopherNeural", // Deep, cinematic male narrator
-    Hindi: "hi-IN-MadhurNeural",        // Professional Hindi male
-    Marathi: "mr-IN-ManoharNeural",     // Professional Marathi male
+    English: "en-US-AriaNeural", // Very natural, expressive female voice
+    Hindi: "hi-IN-SwaraNeural",        // Natural, expressive Hindi female
+    Marathi: "mr-IN-AarohiNeural",     // Natural Marathi female
 };
 
 /**
- * Generate audio narration for a scene using google-tts-api
- * @param {string} narration - Text to speak
- * @param {string} outputPath - Absolute .mp3 file path
- * @param {string} language - Language name
- * @returns {Promise<string>} outputPath on success
+ * Distinct character voices pool for Dialogues separated by gender
  */
-export const generateAudio = async (narration, outputPath, language = "English") => {
-    if (!narration || narration.trim().length === 0) {
-        console.warn("⚠️  TTS: Empty narration, creating silent audio");
-        return createSilentAudio(outputPath);
+const CHARACTER_VOICES = {
+    English: {
+        male: ["en-US-GuyNeural", "en-US-DavisNeural", "en-US-JasonNeural", "en-US-TonyNeural"],
+        female: ["en-US-JennyNeural", "en-US-JaneNeural", "en-US-NancyNeural", "en-US-SaraNeural"]
+    },
+    Hindi: {
+        male: ["hi-IN-MadhurNeural"],
+        female: ["hi-IN-KavyaNeural", "hi-IN-SwaraNeural"]
+    },
+    Marathi: {
+        male: ["mr-IN-ManoharNeural"],
+        female: ["mr-IN-AarohiNeural"]
+    }
+};
+
+/**
+ * Get a narrator voice dynamically based on scene mood
+ */
+const getNarratorVoice = (mood = "", language = "English") => {
+    const m = mood.toLowerCase();
+    if (language === "Hindi") {
+        // ALWAYS use female voice for Hindi Narrator. 
+        // We only have one male voice (Madhur), so if the narrator is male, 
+        // he will collide with male characters in the story.
+        return "hi-IN-SwaraNeural";
+    } else {
+        if (m.includes("action") || m.includes("thriller")) return "en-US-DavisNeural";
+        if (m.includes("horror") || m.includes("mystery")) return "en-US-JasonNeural";
+        if (m.includes("comedy")) return "en-US-JennyNeural";
+        if (m.includes("emotional") || m.includes("drama")) return "en-US-AriaNeural";
+        return "en-US-AriaNeural";
+    }
+};
+
+const getCharacterVoice = (characterName, language, storyData = {}) => {
+    const pools = CHARACTER_VOICES[language] || CHARACTER_VOICES["English"];
+    
+    let isMale = false;
+
+    // Use LLM-generated explicit gender mapping if available
+    if (storyData.characterGenders && storyData.characterGenders[characterName]) {
+        isMale = storyData.characterGenders[characterName].toLowerCase() === "male";
+    } else {
+        // Fallback Heuristic
+        const characterBible = storyData.characterBible || {};
+        const desc = (characterBible[characterName] || characterName).toLowerCase();
+        isMale = /\b(man|boy|male|him|his|gentleman|king|father|brother|uncle|grandfather)\b/i.test(desc) || 
+                 /\b(man|boy|male)\b/i.test(characterName);
+    }
+    
+    // Default to female pool if not explicitly male
+    const pool = isMale ? pools.male : pools.female;
+    
+    let hash = 0;
+    for (let i = 0; i < characterName.length; i++) {
+        hash = characterName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return pool[Math.abs(hash) % pool.length];
+};
+
+/**
+ * Generate audio for a single line of text
+ */
+const generateSingleAudio = async (text, outputPath, voiceName) => {
+    if (!text || text.trim().length === 0) {
+        return createSilentAudio(outputPath, 1);
     }
 
     return new Promise(async (resolve, reject) => {
-        const voiceName = LANGUAGE_VOICE_MAP[language] || "en-US-ChristopherNeural";
-        
-        console.log(`🎙️  TTS (Edge Neural): Generating expressive audio for "${narration.substring(0, 40)}..." in ${language} (${voiceName})`);
+        console.log(`🎙️  TTS (Edge Neural): "${text.substring(0, 40)}..." (${voiceName})`);
 
         let handled = false;
         const timer = setTimeout(() => {
@@ -48,46 +104,89 @@ export const generateAudio = async (narration, outputPath, language = "English")
             
             if (handled) return;
 
-            // Generate directly to file via stream to allow exact file naming
-            const { audioStream } = tts.toStream(narration);
+            const { audioStream } = tts.toStream(text);
+            const dir = path.dirname(outputPath);
+            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+            
             const writeStream = fs.createWriteStream(outputPath);
             
             audioStream.pipe(writeStream);
-
-            writeStream.on("finish", () => {
+            
+            audioStream.on('end', () => {
                 if (handled) return;
                 handled = true;
                 clearTimeout(timer);
-                console.log(`✅ TTS: Cinematic audio saved → ${path.basename(outputPath)}`);
-                resolve(outputPath);
+                resolve();
             });
 
-            writeStream.on("error", (err) => {
+            audioStream.on('error', (err) => {
                 if (handled) return;
                 handled = true;
                 clearTimeout(timer);
-                console.error(`❌ TTS file write error: ${err.message}`);
-                console.warn("⚠️  Falling back to silent audio");
+                console.error(`❌ TTS Stream Error:`, err);
                 createSilentAudio(outputPath).then(resolve).catch(reject);
             });
 
-            audioStream.on("error", (err) => {
-                if (handled) return;
-                handled = true;
-                clearTimeout(timer);
-                console.error(`❌ TTS stream error: ${err.message}`);
-                console.warn("⚠️  Falling back to silent audio");
-                createSilentAudio(outputPath).then(resolve).catch(reject);
-            });
-        } catch (err) {
+        } catch (error) {
+            console.error("❌ Edge TTS Connection Error:", error.message);
             if (handled) return;
             handled = true;
             clearTimeout(timer);
-            console.error(`❌ TTS Edge Neural error: ${err.message}`);
             console.warn("⚠️  Falling back to silent audio");
             createSilentAudio(outputPath).then(resolve).catch(reject);
         }
     });
+};
+
+/**
+ * Generate combined audio (Narration + Dialogues) for a scene
+ */
+export const generateSceneAudio = async (scene, outputPath, language = "English", storyData = {}) => {
+    const tempAudioPaths = [];
+    const baseDir = path.dirname(outputPath);
+    const characterBible = storyData.characterBible || {};
+
+    try {
+        // 1. Generate Narration Audio
+        const globalMood = storyData.mood || scene.mood || "";
+        const narratorVoice = getNarratorVoice(globalMood, language);
+        if (scene.narration) {
+            const narPath = path.join(baseDir, `temp_narration_${scene.sceneNumber}_${Date.now()}.mp3`);
+            await generateSingleAudio(scene.narration, narPath, narratorVoice);
+            tempAudioPaths.push(narPath);
+        }
+
+        // 2. Generate Dialogue Audio
+        if (scene.dialogue && Array.isArray(scene.dialogue)) {
+            for (let i = 0; i < scene.dialogue.length; i++) {
+                const line = scene.dialogue[i];
+                if (line.text && line.character) {
+                    const charVoice = getCharacterVoice(line.character, language, storyData);
+                    const dialPath = path.join(baseDir, `temp_dialogue_${scene.sceneNumber}_${i}_${Date.now()}.mp3`);
+                    await generateSingleAudio(line.text, dialPath, charVoice);
+                    tempAudioPaths.push(dialPath);
+                }
+            }
+        }
+
+        // 3. Combine if we have parts
+        if (tempAudioPaths.length > 0) {
+            await concatenateAudioFiles(tempAudioPaths, outputPath);
+        } else {
+            console.warn("⚠️  TTS: Scene has no text, creating silent audio");
+            await createSilentAudio(outputPath, 5);
+        }
+    } catch (err) {
+        console.error(`❌ generateSceneAudio failed: ${err.message}`);
+        await createSilentAudio(outputPath, 5);
+    } finally {
+        // Cleanup temp files
+        for (const p of tempAudioPaths) {
+            if (fs.existsSync(p)) fs.unlinkSync(p);
+        }
+    }
+
+    return outputPath;
 };
 
 /**

@@ -16,7 +16,7 @@ const sanitizePromptForApi = (prompt) => {
     if (!prompt) return "Cinematic scene dramatic lighting 8k resolution";
     const latinOnly = prompt.replace(/[^\x00-\x7F]/g, " ").replace(/\s+/g, " ").trim();
     if (latinOnly.length >= 10) {
-        return latinOnly.substring(0, 200);
+        return latinOnly.substring(0, 800);
     }
     return "Cinematic story scene dramatic lighting volumetric atmosphere 8k resolution";
 };
@@ -104,13 +104,13 @@ export const generateImage = async (visualPrompt, outputPath, width = 1080, heig
 };
 
 /**
- * Pollinations.ai — free AI image generation
+ * Generates an image natively using Pollinations API with strict Flux model
  */
 const generateWithPollinations = async (visualPrompt, outputPath, width, height) => {
     const cleanPrompt = sanitizePromptForApi(visualPrompt);
     const encodedPrompt = encodeURIComponent(cleanPrompt);
     const seed = Math.floor(Math.random() * 1000000);
-    const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&nologo=true&seed=${seed}`;
+    const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&nologo=true&seed=${seed}&model=flux&enhance=false`;
 
     console.log(`🎨 Pollinations: Generating image... (${width}x${height})`);
 

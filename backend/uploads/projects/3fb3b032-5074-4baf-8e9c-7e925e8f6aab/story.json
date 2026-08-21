@@ -1,0 +1,241 @@
+{
+  "title": "२४ घंटे बाद की तस्वीर",
+  "description": "एक नौजवान को एक ऐसा जादुई कैमरा मिलता है जो ठीक २४ घंटे बाद होने वाली घटनाओं की तस्वीर खींचता है। जब एक बैंक डकैती की तस्वीर सामने आती है, तो हंसी और रोमांच का एक अनोखा खेल शुरू होता है।",
+  "language": "Hindi",
+  "duration": 60,
+  "style": "Storytelling",
+  "mood": "Drama, Suspense, Action, Comedy, Mystery",
+  "characterBible": {
+    "Rohan": "Rohan, a 22-year-old South Asian male with messy black hair, expressive brown eyes, wearing a blue denim jacket over a yellow t-shirt, dark jeans, carrying a vintage instant photo camera.",
+    "Kabir": "Kabir, a 23-year-old South Asian male with a short fade haircut, neatly trimmed beard, wearing a bright floral hoodie and dark sneakers."
+  },
+  "characterGenders": {
+    "Rohan": "male",
+    "Kabir": "male"
+  },
+  "locationBible": {
+    "RohanStudio": "A cozy, cluttered apartment room with warm tungsten light, vintage photo prints hanging on string wires, and scattered camera equipment.",
+    "TeaStall": "A vibrant roadside tea stall in India, colorful autorickshaws in the background, bustling evening crowd, steaming tea kettle.",
+    "CityBankExterior": "A modern bank building exterior with large glass doors, concrete steps, busy street traffic, framed in crisp daylight.",
+    "PoliceStationOrJail": "A dimly lit indoor space with iron jail bars and dark shadows, contrasting with bright background light."
+  },
+  "importantObjects": [
+    "Vintage Instant Camera",
+    "Polaroid Photo Prints"
+  ],
+  "scenes": [
+    {
+      "sceneNumber": 1,
+      "duration": 12,
+      "storyBeat": "Discovery & Comedic Mystery",
+      "location": "RohanStudio",
+      "charactersInScene": [
+        "Rohan",
+        "Kabir"
+      ],
+      "currentSceneState": "Rohan tests his new vintage camera by snapping a picture of Kabir.",
+      "previousSceneState": "None",
+      "nextSceneHint": "The polaroid reveals an impossible future event.",
+      "continuityNotes": "Camera is a vintage instant polaroid. Rohan is wearing his denim jacket over a yellow t-shirt.",
+      "narration": "रोहन को एक पुराना पोलेरॉइड कैमरा मिला। उसने मज़ाक में अपने दोस्त कबीर की तस्वीर खींची, लेकिन जो फोटो बाहर आई, उसने दोनों के होश उड़ा दिए!",
+      "captions": [
+        "एक अनोखा कैमरा",
+        "भविष्य की तस्वीर?"
+      ],
+      "dialogue": [
+        {
+          "character": "Kabir",
+          "text": "अरे भाई, मैं तो समोसा खा रहा हूँ, फोटो में मेरी हुडी पर चाय कैसे गिरी हुई है?"
+        },
+        {
+          "character": "Rohan",
+          "text": "मुझे क्या पता! यह कैमरा सच में अजीब है।"
+        }
+      ],
+      "visualPrompt": "In a cozy cluttered studio, Rohan, a 22-year-old South Asian male with messy black hair, expressive brown eyes, wearing a blue denim jacket over a yellow t-shirt, snaps a vintage instant camera at Kabir, a 23-year-old South Asian male with a short fade haircut and neatly trimmed beard wearing a bright floral hoodie who is eating a samosa. The instant photo slides out, showing Kabir with a huge brown tea stain on his hoodie.",
+      "visualBeats": [
+        "Rohan points the vintage photo camera and flashes a shot.",
+        "The photo slow-develops showing a tea stain on Kabir's chest.",
+        "Kabir looks down at his perfectly clean hoodie in confusion."
+      ],
+      "cameraMovement": "medium shot -> quick punch-in to the developing polaroid photo",
+      "mood": "Comedy, Mystery",
+      "soundEffects": [
+        "Camera shutter click",
+        "Ejecting photo whirring sound"
+      ],
+      "musicMood": "Playful, mysterious acoustic guitar rhythm"
+    },
+    {
+      "sceneNumber": 2,
+      "duration": 12,
+      "storyBeat": "Verification & Realization",
+      "location": "TeaStall",
+      "charactersInScene": [
+        "Rohan",
+        "Kabir"
+      ],
+      "currentSceneState": "Exactly 24 hours later, the event predicted by the photo happens in real life.",
+      "previousSceneState": "Rohan and Kabir were confused by the photograph.",
+      "nextSceneHint": "Rohan decides to test the camera on a bigger target.",
+      "continuityNotes": "Kabir is wearing the same floral hoodie as yesterday.",
+      "narration": "ठीक २४ घंटे बाद... चाय की टपरी पर वही हुआ जो तस्वीर में था! रोहन समझ गया, यह कैमरा ठीक २४ घंटे आगे का भविष्य दिखाता है।",
+      "captions": [
+        "२४ घंटे बाद...",
+        "भविष्य सच साबित हुआ!"
+      ],
+      "dialogue": [
+        {
+          "character": "Kabir",
+          "text": "अरे नहीं! मेरी पसंदीदा हुडी पर गर्म चाय गिर गई!"
+        },
+        {
+          "character": "Rohan",
+          "text": "कबीर! समय देख... ठीक २४ घंटे! यह कैमरा कल का सच दिखाता है!"
+        }
+      ],
+      "visualPrompt": "At a bustling Indian roadside tea stall, Kabir, a 23-year-old South Asian male with a short fade haircut, neatly trimmed beard, wearing a bright floral hoodie, accidentally bumps his elbow and spills hot tea all over his chest. Rohan, a 22-year-old South Asian male with messy black hair, wearing a blue denim jacket over a yellow t-shirt, holds up yesterday's polaroid photo right next to Kabir, matching the pose and stain perfectly.",
+      "visualBeats": [
+        "Kabir spills tea on himself in slow motion.",
+        "Rohan places the original polaroid photo side-by-side with real life.",
+        "Both characters look at each other with wide eyes."
+      ],
+      "cameraMovement": "tracking shot of spilled tea -> split-focus macro shot comparing photo to reality",
+      "mood": "Drama, Comedy, Suspense",
+      "soundEffects": [
+        "Tea splash sound",
+        "Gasp sound",
+        "Street traffic background noise"
+      ],
+      "musicMood": "Tense synth build-up turning into a lighthearted comedic sting"
+    },
+    {
+      "sceneNumber": 3,
+      "duration": 12,
+      "storyBeat": "Mystery & High Stakes Setup",
+      "location": "CityBankExterior",
+      "charactersInScene": [
+        "Rohan",
+        "Kabir"
+      ],
+      "currentSceneState": "Rohan takes a photo of the city bank, revealing a major crime that will happen tomorrow.",
+      "previousSceneState": "They verified the camera's powers at the tea stall.",
+      "nextSceneHint": "They set out to stop the predicted bank robbery.",
+      "continuityNotes": "Rohan holds the vintage instant camera.",
+      "narration": "अपनी थ्योरी को पक्का करने के लिए रोहन ने सिटी बैंक के बाहर एक तस्वीर खींची। और जब फोटो बाहर आई, तो दोनों के पसीने छूट गए!",
+      "captions": [
+        "अगली तस्वीर...",
+        "कल शाम ४ बजे डाका!"
+      ],
+      "dialogue": [
+        {
+          "character": "Rohan",
+          "text": "कबीर... कल शाम ठीक ४ बजे इस बैंक में डाका पड़ने वाला है!"
+        },
+        {
+          "character": "Kabir",
+          "text": "क्या?! अब हम क्या करें, हीरो बनें या भाग जाएँ?"
+        }
+      ],
+      "visualPrompt": "Outside a modern glass bank building, Rohan, a 22-year-old South Asian male with messy black hair, wearing a blue denim jacket over a yellow t-shirt, takes a photo with his vintage instant camera. Beside him, Kabir, a 23-year-old South Asian male in his floral hoodie, watches as the photo develops, showing a masked robber running out of the bank doors with a red duffel bag under dark stormy skies.",
+      "visualBeats": [
+        "Rohan snaps a picture of the quiet bank building.",
+        "The developing photo slowly reveals a masked robber running out.",
+        "Rohan points at the clock tower in the photo showing 4:00 PM."
+      ],
+      "cameraMovement": "low angle camera tilt down -> extreme close-up on the polaroid reveal",
+      "mood": "Suspense, Mystery",
+      "soundEffects": [
+        "Dramatic ticking clock sound",
+        "Thunder rumble in distance"
+      ],
+      "musicMood": "High suspense orchestrations with pulsing bass lines"
+    },
+    {
+      "sceneNumber": 4,
+      "duration": 14,
+      "storyBeat": "Action & Comedic Resolution",
+      "location": "CityBankExterior",
+      "charactersInScene": [
+        "Rohan",
+        "Kabir"
+      ],
+      "currentSceneState": "At exactly 3:59 PM the next day, the robbery happens and Kabir accidentally stops it.",
+      "previousSceneState": "Rohan and Kabir discovered the predicted bank robbery.",
+      "nextSceneHint": "They celebrate their victory before taking one last photo.",
+      "continuityNotes": "Time is 4:00 PM. Same clothes for consistency.",
+      "narration": "अगले दिन ठीक ३:५९ बजे... नकाबपोश चोर बैंक से बाहर भागा! रोहन और कबीर ने बहादुरी दिखाई, और कबीर ने अनजाने में ही सही, चोर को दबोच लिया!",
+      "captions": [
+        "अचानक हमला!",
+        "अनोखा हीरो!"
+      ],
+      "dialogue": [
+        {
+          "character": "Kabir",
+          "text": "मैं तो बस फिसल गया था, पर पकड़ लिया चोर को!"
+        },
+        {
+          "character": "Rohan",
+          "text": "मान गए भाई, तू तो असली हीरो निकला!"
+        }
+      ],
+      "visualPrompt": "Outside the city bank, a masked robber runs out carrying a red bag. Kabir, a 23-year-old South Asian male in a bright floral hoodie, accidentally trips over a tea tray and crashes right into the robber, knocking him flat onto the ground. Rohan, a 22-year-old South Asian male in a blue denim jacket, cheers excitedly as security guards rush in to arrest the robber.",
+      "visualBeats": [
+        "Masked robber bursts out of bank entrance.",
+        "Kabir slips clumsily and tackles the robber to the ground.",
+        "Rohan jumps in excitement while holding his vintage instant camera."
+      ],
+      "cameraMovement": "fast whip pan following the robber -> action handheld dynamic camera angle",
+      "mood": "Action, Comedy",
+      "soundEffects": [
+        "Bank alarm ringing",
+        "Funny crash impact sound",
+        "Cheering crowd sound"
+      ],
+      "musicMood": "Fast energetic action music with upbeat percussion"
+    },
+    {
+      "sceneNumber": 5,
+      "duration": 10,
+      "storyBeat": "The Twist & Cliffhanger Ending",
+      "location": "RohanStudio",
+      "charactersInScene": [
+        "Rohan",
+        "Kabir"
+      ],
+      "currentSceneState": "Rohan takes a hero portrait of Kabir, but the photo reveals a shocking twist for tomorrow.",
+      "previousSceneState": "They successfully captured the bank robber.",
+      "nextSceneHint": "End of story on a humorous cliffhanger.",
+      "continuityNotes": "Back in Rohan's studio apartment.",
+      "narration": "जीत की खुशी में रोहन ने कबीर की एक और स्टाइल वाली फोटो खींची। लेकिन जब फोटो डेवलप हुई... कहानी में असली मोड़ तो अब आया!",
+      "captions": [
+        "जीत का जश्न!",
+        "बड़ा ट्विस्ट!"
+      ],
+      "dialogue": [
+        {
+          "character": "Kabir",
+          "text": "खींच भाई एक डैशिंग फोटो! आखिर हीरो हूँ मैं!"
+        },
+        {
+          "character": "Rohan",
+          "text": "कबीर... तू कल जेल की सलाखों के पीछे क्या कर रहा है?!"
+        }
+      ],
+      "visualPrompt": "In the cozy studio apartment, Kabir, a 23-year-old South Asian male in a floral hoodie, poses heroically with his arms crossed. Rohan, a 22-year-old South Asian male in a denim jacket, snaps his vintage camera. The photo ejects and slow-develops to reveal Kabir behind dark iron jail bars in a striped prison suit. Rohan's face turns completely shocked as Kabir smiles unsuspectingly.",
+      "visualBeats": [
+        "Kabir strikes a funny heroic pose.",
+        "Rohan snaps the camera shutter.",
+        "Close up on photo revealing Kabir in prison stripes behind jail bars tomorrow.",
+        "Rohan turns slowly to look at Kabir in horror."
+      ],
+      "cameraMovement": "medium shot -> slow rack focus from Kabir posing to the shocking photo in Rohan's hands",
+      "mood": "Comedy, Mystery, Drama",
+      "soundEffects": [
+        "Camera flash bang",
+        "Suspenseful violin screech comedic hit"
+      ],
+      "musicMood": "Funny dramatic tension music ending abruptly on a freeze frame"
+    }
+  ]
+}

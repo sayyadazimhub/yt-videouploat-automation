@@ -15,71 +15,88 @@ const getClient = () => {
     return new GoogleGenerativeAI(apiKey);
 };
 
-const SYSTEM_INSTRUCTION = `You are a narrative design agent for a multi-media storytelling pipeline. Your core job is to generate compelling stories with authentic emotional depth, genre-specific tension, and cinematic presence—paired with captions and visual direction that reinforce mood and pacing.
+const SYSTEM_INSTRUCTION = `You are a narrative design agent for a multi-media storytelling pipeline. Your core job is to generate compelling stories that act as faithful cinematic planners.
 
-You craft stories that feel lived, not recited. Every narrative you generate should immerse the audience in genuine emotion. The story, captions, and visual/animation choices work as one unified experience.
+Story Fidelity Rules (CRITICAL):
+1. PRESERVE THE ORIGINAL PREMISE: The user's prompt is the absolute source of truth. Extract the core premise, characters, locations, and goals, and DO NOT change their meaning.
+2. NO AUTOMATIC MORALIZATION: NEVER add moral lessons, motivational speeches, "believe in yourself", "make a better tomorrow", or generic life lessons unless the user explicitly asks for them. A mystery/sci-fi story should remain a mystery/sci-fi story. The lesson taught in a classroom is a subject, NOT a story's moral theme.
+3. AVOID OVER-INVENTING: Do not invent major story tropes like time travel, chosen ones, secret missions, magic, or prophecies unless they are in the user prompt. A hidden staircase is just a hidden staircase.
+4. TIMELINE CONSISTENCY: NEVER hardcode specific years (e.g. 2080 vs 2100) unless requested. Use "the present" or "the future". If a year is used, it MUST remain completely consistent across all scenes.
+5. NO REPETITIVE SCENES: Two consecutive scenes should not show the same action unless it meaningfully progresses. Keep scenes paced properly (e.g. Discovery -> Investigation -> Transition -> Arrival -> Core Action -> Mystery/Cliffhanger).
+6. ENDING: Conclude the story organically and satisfyingly based on its genre. Do NOT force a motivational wrap-up. Let the narrative reach a natural resolution.
 
-Storytelling standards:
-- Emotion: Write so the audience feels the stakes. Use sensory language, internal conflict, and authentic reactions. Avoid telling ("she was sad"); show the weight of it.
-- Suspense: Plant unanswered questions. Delay reveals. Build pressure.
-- Drama: Escalate conflict. Ground stakes in what matters to the character.
-- Action: Propel momentum. Use short sentences, vivid verbs.
-- Comedy: Find the unexpected angle. Use timing, irony, or character contradiction.
-- Mystery: Withhold information strategically. Scatter clues.
-- Horror: Create dread through what's unseen or implied. Build atmosphere before the scare.
-- Romantic: Earn the connection. Show vulnerability, tension, and genuine care.
-
-Visual/animation direction: Specify the feeling, not just the image. Example: "Dark, rain-streaked close-up; camera slightly tilted to suggest disorientation; slow zoom on the character's eyes as realization hits" rather than "show a rainy scene."
+Visual/animation direction:
+- CHARACTER CONSISTENCY IS MANDATORY. Define a "characterBible" and "locationBible" at the root level.
+- In every single visualPrompt, explicitly re-describe the exact physical appearance of the main characters based on the characterBible.
+- Specify exact cinematic camera movements (e.g., "wide establishing shot", "slow tracking movement") instead of generic zooms.
 
 Your task is to generate this complete cinematic story in valid JSON format ONLY.
-Do NOT include any markdown, code fences, explanations, or extra text — return ONLY the raw JSON object.
-The JSON must be parseable by JSON.parse() without any pre-processing.
-Every scene must have realistic duration values that sum to approximately the total requested duration.`;
+Do NOT include any markdown, code fences, explanations, or extra text — return ONLY the raw JSON object.`;
 
-const buildUserPrompt = (prompt, style, mood, language, duration) => {
+const buildUserPrompt = (prompt, style, mood, language, duration, validationFeedback = null) => {
     const moodList = Array.isArray(mood) ? mood.join(", ") : mood;
+    const feedbackText = validationFeedback ? `\n\nPREVIOUS ATTEMPT FAILED VALIDATION:\n${validationFeedback}\n\nPlease revise the story to fix these issues while maintaining the original premise.` : "";
+    
     return `Create a cinematic story with the following specifications:
 
 Story Idea: ${prompt}
-Style: ${style}
+Style: Storytelling
 Mood(s): ${moodList}
 Language: ${language}
-Total Duration: ${duration} seconds
-Number of Scenes: DYNAMIC (Create as many scenes as necessary to best tell the story. Each scene should have a natural duration between 5 and 20 seconds. The total durations must sum to approximately ${duration} seconds).
-CRITICAL: The story MUST have a complete narrative arc (beginning, middle, and a clear, satisfying ending). Do NOT leave the story incomplete or on a cliffhanger. The final scene must resolve the plot within the given duration.
+Target Duration: ~${duration} seconds (This is an APPROXIMATE target. The story length is DYNAMIC. Prioritize concluding the story organically over strictly hitting this limit).
+Number of Scenes: DYNAMIC (Determine the number of scenes based on story complexity. Each scene should represent a meaningful story beat).${feedbackText}
 
-Return ONLY this exact JSON structure (no markdown, no code fences):
+NARRATIVE TONE GUIDELINES (CRITICAL):
+The story's narration, dialogue, and pacing MUST heavily reflect the requested Mood(s) (${moodList}). 
+- If Comedy: Use a lighthearted tone, humorous situations, witty dialogue, and comedic timing.
+- If Horror/Suspense: Use dread-inducing vocabulary, tense pacing, focus on shadows/isolation, and create visceral fear.
+- If Drama/Emotional: Focus on deep character feelings, relational conflict, poignant dialogue, and moving narration.
+- If Action: Use fast-paced, punchy sentences. Emphasize kinetic movement, urgency, and high stakes.
+- If Romantic: Focus on intimate character dynamics, warmth, longing, and tender dialogue.
+- If Mystery: Focus on the unknown, cryptic clues, subtle reveals, and atmospheric tension.
+(Blend these instructions dynamically if multiple moods are selected).
+
+Return ONLY this exact JSON structure (no markdown):
 {
   "title": "Story Title Here",
   "description": "A 2-3 sentence story description",
   "language": "${language}",
   "duration": ${duration},
-  "style": "${style}",
+  "style": "Storytelling",
   "mood": "${moodList}",
+  "characterBible": { "CharacterName": "Detailed physical description (age, hair, eyes, clothing, ethnicity)" },
+  "characterGenders": { "CharacterName": "male or female (strictly one of these two)" },
+  "locationBible": { "LocationName": "Detailed physical description of the space" },
+  "importantObjects": ["List of objects that must remain consistent"],
   "scenes": [
     {
       "sceneNumber": 1,
       "duration": 15,
-      "narration": "The spoken voiceover script. Write it as if a real human is speaking naturally. Use short sentences, natural pauses (commas, ellipses), and a conversational tone. Convey emotion organically. DO NOT write it like a novel or book.",
-      "captions": ["Short, rhythmic, and emotionally resonant text overlays", "Match pacing to the narrative"],
+      "storyBeat": "What happens in this specific scene (e.g., Discovery, Investigation)",
+      "location": "LocationName",
+      "charactersInScene": ["CharacterName"],
+      "currentSceneState": "What is happening now",
+      "previousSceneState": "What happened right before this (or 'None' for scene 1)",
+      "nextSceneHint": "What should happen next",
+      "continuityNotes": "What must remain consistent. Do NOT hardcode years unless necessary.",
+      "narration": "The spoken voiceover script in ${language}. Generate an amount of text that fits the scene duration.",
+      "captions": ["Short, rhythmic overlays in ${language}", "MUST relate exactly to the mystery/plot, no generic motivational quotes"],
       "dialogue": [
         { "character": "Character Name", "text": "Dialogue line here" }
       ],
-      "visualPrompt": "Specific, actionable notes on imagery, color palette, and lighting that match the emotional arc. Specify the feeling (e.g., 'Dark, rain-streaked close-up; camera slightly tilted'). Must strictly match the requested style: ${style}.",
-      "cameraMovement": "Specific motion notes (e.g., 'slow zoom on the character\\'s eyes as realization hits').",
-      "mood": "Suspense",
+      "visualPrompt": "Specific, actionable notes. Must embed the exact character descriptions from the characterBible here. Must strictly match the style: Storytelling.",
+      "visualBeats": ["Action 1", "Action 2", "Action 3"],
+      "cameraMovement": "Cinematic direction (e.g., 'wide establishing shot -> slow tracking movement', 'close-up')",
+      "mood": "${moodList}",
       "soundEffects": ["Rain pattering", "Distant thunder"],
-      "musicMood": "Dark suspense"
+      "musicMood": "${moodList}"
     }
   ]
 }
 
 IMPORTANT:
-- All scene durations must add up to exactly ${duration} seconds
-- Regardless of what language the "Story Idea" is written in, the "title", "description", "narration", "captions", and "dialogue" MUST BE ENTIRELY translated to and written in ${language}. 
-- Do NOT mix languages. If ${language} is Hindi or Marathi, use the native Devanagari script exclusively.
-- Visual prompts MUST be strictly in English regardless of the story language.
-- Make the story compelling, dramatic, and cinematic. Emotion and specificity matter more than generic exposition.
+- Regardless of what language the "Story Idea" is written in, "title", "description", "narration", "captions", and "dialogue" MUST BE entirely in ${language}. 
+- Visual prompts MUST be strictly in English and MUST contain the detailed character design sheet for consistency.
 - Return ONLY the JSON — nothing else`;
 };
 
@@ -119,15 +136,56 @@ const validateStoryJson = (data) => {
 
     data.scenes.forEach((scene, i) => {
         if (typeof scene.sceneNumber === "undefined") throw new Error(`Scene ${i + 1}: missing sceneNumber`);
-        if (!scene.narration) throw new Error(`Scene ${i + 1}: missing narration`);
+        if (!scene.narration && !scene.dialogue) throw new Error(`Scene ${i + 1}: missing narration and dialogue`);
         if (!scene.visualPrompt) throw new Error(`Scene ${i + 1}: missing visualPrompt`);
-        if (!scene.duration) scene.duration = 10; // default fallback
+        if (!scene.duration) scene.duration = 15; // default fallback
+        
+        // Ensure arrays exist to prevent pipeline crashes
+        if (!scene.captions) scene.captions = [];
+        if (!scene.dialogue) scene.dialogue = [];
+        if (!scene.soundEffects) scene.soundEffects = [];
+        if (!scene.visualBeats) scene.visualBeats = [];
     });
 
     return true;
 };
 
+const validateStoryFidelity = async (client, modelName, originalPrompt, storyData) => {
+    const model = client.getGenerativeModel({ model: modelName });
+    const prompt = `You are a strict story validation AI. Evaluate the following generated story against the original user prompt.
+    
+Original User Prompt: "${originalPrompt}"
 
+Generated Story Description: "${storyData.description}"
+Number of Scenes: ${storyData.scenes.length}
+First Scene Story Beat: "${storyData.scenes[0]?.storyBeat}"
+Last Scene Story Beat: "${storyData.scenes[storyData.scenes.length - 1]?.storyBeat}"
+Sample Captions: ${JSON.stringify(storyData.scenes.map(s => s.captions).flat().slice(0, 5))}
+
+Validation Criteria:
+1. NO MORALIZATION (CRITICAL): Did the story invent a motivational ending, self-help metaphor, or "change the future" life lesson? If the user prompt did not ask for a moral lesson, YOU MUST FAIL THIS IF IT CONTAINS ONE.
+2. Premise Fidelity: Does the story stay faithful to the original premise without twisting the meaning? Are major tropes like "time travel", "magic", or "chosen ones" unnecessarily invented?
+3. Timeline Continuity (CRITICAL): Are there any conflicting dates or years in the continuityNotes or narration?
+4. Scene Progression: Do consecutive scenes show the exact same action? Does the pacing flow from discovery to mystery?
+5. Captions: Are captions strictly relevant to the literal plot, rather than generic motivation (e.g. "Create your own destiny")?
+
+Reply ONLY with a JSON object:
+{
+  "isValid": true/false,
+  "reason": "If false, explain exactly what needs to be fixed (e.g., 'Remove the motivational speech at the end', 'Fix conflicting dates'). If true, leave empty."
+}
+Do not include markdown or code fences.`;
+
+    try {
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        const parsed = extractJson(text);
+        return parsed;
+    } catch (e) {
+        console.error("⚠️ Failed to validate story fidelity, assuming valid.", e);
+        return { isValid: true };
+    }
+};
 
 /**
  * Generate a structured story JSON from user input using Gemini
@@ -157,20 +215,44 @@ export const generateStory = async (prompt, style, mood, language, duration) => 
                 systemInstruction: SYSTEM_INSTRUCTION,
             });
 
-            const userPrompt = buildUserPrompt(prompt, style, mood, language, duration);
-            const result = await model.generateContent(userPrompt);
-            const text = result.response.text();
+            let validationFeedback = null;
+            let finalParsed = null;
+            let attempts = 0;
+            const MAX_STORY_ATTEMPTS = 3;
 
-            console.log(`✅ Gemini (${modelName}): Raw response received (${text.length} chars)`);
+            while (attempts < MAX_STORY_ATTEMPTS && !finalParsed) {
+                attempts++;
+                const userPrompt = buildUserPrompt(prompt, style, mood, language, duration, validationFeedback);
+                const result = await model.generateContent(userPrompt);
+                const text = result.response.text();
 
-            const parsed = extractJson(text);
-            validateStoryJson(parsed);
+                console.log(`✅ Gemini (${modelName}): Raw response received (Attempt ${attempts})`);
+
+                const parsed = extractJson(text);
+                validateStoryJson(parsed);
+
+                // Run semantic validation
+                console.log(`🔍 Validating story fidelity...`);
+                const validationResult = await validateStoryFidelity(client, modelName, prompt, parsed);
+                
+                if (validationResult.isValid) {
+                    console.log(`✅ Story fidelity validation passed.`);
+                    finalParsed = parsed;
+                } else {
+                    console.log(`❌ Story fidelity validation failed: ${validationResult.reason}`);
+                    validationFeedback = validationResult.reason;
+                }
+            }
+            
+            if (!finalParsed) {
+                throw new Error("Failed to generate a valid story after multiple attempts. Last reason: " + validationFeedback);
+            }
 
             // Ensure duration field is set
-            parsed.duration = parsed.duration || duration;
+            finalParsed.duration = finalParsed.duration || duration;
 
-            console.log(`✅ Gemini: Story generated — "${parsed.title}" (${parsed.scenes.length} scenes)`);
-            return parsed;
+            console.log(`✅ Gemini: Story generated — "${finalParsed.title}" (${finalParsed.scenes.length} scenes)`);
+            return finalParsed;
         } catch (error) {
             lastError = error;
             console.error(`❌ Gemini model "${modelName}" failed: ${error.message}`);

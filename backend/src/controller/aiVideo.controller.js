@@ -19,11 +19,10 @@ export const generateStoryController = async (req, res) => {
             });
         }
 
-        const validStyles = ["Cinematic", "Documentary", "Short Film", "Anime", "Storytelling", "Thriller"];
         const validLanguages = ["English", "Hindi", "Marathi"];
         const validDurations = [30, 60, 120, 180];
 
-        const storyStyle = validStyles.includes(style) ? style : "Cinematic";
+        const storyStyle = "Storytelling";
         const storyLanguage = validLanguages.includes(language) ? language : "English";
         const storyDuration = validDurations.includes(Number(duration)) ? Number(duration) : 60;
         const storyMood = Array.isArray(mood) ? mood : [mood || "Drama"];
@@ -38,9 +37,6 @@ export const generateStoryController = async (req, res) => {
             storyLanguage,
             storyDuration
         );
-
-        // Normalize scene durations
-        storyData.scenes = normalizeDurations(storyData.scenes, storyDuration);
 
         // Create project in DB (no video generation yet)
         const projectId = generateProjectId();

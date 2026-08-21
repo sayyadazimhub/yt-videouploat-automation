@@ -1,0 +1,43 @@
+{
+  "sceneNumber": 5,
+  "duration": 10,
+  "storyBeat": "The Twist & Cliffhanger Ending",
+  "location": "RohanStudio",
+  "charactersInScene": [
+    "Rohan",
+    "Kabir"
+  ],
+  "currentSceneState": "Rohan takes a hero portrait of Kabir, but the photo reveals a shocking twist for tomorrow.",
+  "previousSceneState": "They successfully captured the bank robber.",
+  "nextSceneHint": "End of story on a humorous cliffhanger.",
+  "continuityNotes": "Back in Rohan's studio apartment.",
+  "narration": "जीत की खुशी में रोहन ने कबीर की एक और स्टाइल वाली फोटो खींची। लेकिन जब फोटो डेवलप हुई... कहानी में असली मोड़ तो अब आया!",
+  "captions": [
+    "जीत का जश्न!",
+    "बड़ा ट्विस्ट!"
+  ],
+  "dialogue": [
+    {
+      "character": "Kabir",
+      "text": "खींच भाई एक डैशिंग फोटो! आखिर हीरो हूँ मैं!"
+    },
+    {
+      "character": "Rohan",
+      "text": "कबीर... तू कल जेल की सलाखों के पीछे क्या कर रहा है?!"
+    }
+  ],
+  "visualPrompt": "In the cozy studio apartment, Kabir, a 23-year-old South Asian male in a floral hoodie, poses heroically with his arms crossed. Rohan, a 22-year-old South Asian male in a denim jacket, snaps his vintage camera. The photo ejects and slow-develops to reveal Kabir behind dark iron jail bars in a striped prison suit. Rohan's face turns completely shocked as Kabir smiles unsuspectingly.",
+  "visualBeats": [
+    "Kabir strikes a funny heroic pose.",
+    "Rohan snaps the camera shutter.",
+    "Close up on photo revealing Kabir in prison stripes behind jail bars tomorrow.",
+    "Rohan turns slowly to look at Kabir in horror."
+  ],
+  "cameraMovement": "medium shot -> slow rack focus from Kabir posing to the shocking photo in Rohan's hands",
+  "mood": "Comedy, Mystery, Drama",
+  "soundEffects": [
+    "Camera flash bang",
+    "Suspenseful violin screech comedic hit"
+  ],
+  "musicMood": "Funny dramatic tension music ending abruptly on a freeze frame"
+}

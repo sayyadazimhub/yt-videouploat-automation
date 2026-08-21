@@ -470,46 +470,24 @@ export default function AiVideoPage() {
               <p className="text-slate-600 text-xs mt-2">{formData.prompt.length} characters (minimum 10)</p>
             </div>
 
-            {/* Style + Language */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="glass-card p-6">
-                <SectionLabel>Style</SectionLabel>
-                <div className="grid grid-cols-2 gap-2">
-                  {STYLES.map((s) => (
-                    <button
-                      key={s}
-                      id={`style-${s.toLowerCase().replace(/\s/g, "-")}`}
-                      onClick={() => setFormData({ ...formData, style: s })}
-                      className={`px-3 py-2.5 rounded-xl text-sm font-semibold border transition-all ${
-                        formData.style === s
-                          ? "bg-[#D4AF37]/20 border-[#D4AF37]/60 text-[#D4AF37]"
-                          : "bg-[#141414] border-[#2a2a2a] text-slate-400 hover:border-[#3a3a3a] hover:text-white"
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="glass-card p-6">
-                <SectionLabel>Language</SectionLabel>
-                <div className="flex flex-col gap-2">
-                  {LANGUAGES.map((l) => (
-                    <button
-                      key={l}
-                      id={`lang-${l.toLowerCase()}`}
-                      onClick={() => setFormData({ ...formData, language: l })}
-                      className={`px-4 py-3 rounded-xl text-sm font-semibold border transition-all text-left ${
-                        formData.language === l
-                          ? "bg-[#D4AF37]/20 border-[#D4AF37]/60 text-[#D4AF37]"
-                          : "bg-[#141414] border-[#2a2a2a] text-slate-400 hover:border-[#3a3a3a] hover:text-white"
-                      }`}
-                    >
-                      {l}
-                    </button>
-                  ))}
-                </div>
+            {/* Language */}
+            <div className="glass-card p-6">
+              <SectionLabel>Language</SectionLabel>
+              <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
+                {LANGUAGES.map((l) => (
+                  <button
+                    key={l}
+                    id={`lang-${l.toLowerCase()}`}
+                    onClick={() => setFormData({ ...formData, language: l })}
+                    className={`px-4 py-3 rounded-xl text-sm font-semibold border transition-all text-center ${
+                      formData.language === l
+                        ? "bg-[#D4AF37]/20 border-[#D4AF37]/60 text-[#D4AF37]"
+                        : "bg-[#141414] border-[#2a2a2a] text-slate-400 hover:border-[#3a3a3a] hover:text-white"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
               </div>
             </div>
 

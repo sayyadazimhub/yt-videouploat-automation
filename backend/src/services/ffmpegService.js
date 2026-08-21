@@ -63,7 +63,15 @@ const buildVideoFilter = (effect, duration, width, height) => {
         ken_burns: `scale=${w * 2}:${h * 2},zoompan=z='min(zoom+0.001,1.3)':x='if(lte(on,1),0,(iw-iw/zoom)/2)':y='if(lte(on,1),0,(ih-ih/zoom)/2)':d=${d * 25}:s=${w}x${h}:fps=25`,
     };
 
-    return filters[effect] || filters.zoom_in;
+    const effectLower = (effect || "").toLowerCase();
+    
+    if (effectLower.includes("zoom in") || effectLower.includes("crash zoom")) return filters.zoom_in;
+    if (effectLower.includes("zoom out") || effectLower.includes("pull back")) return filters.zoom_out;
+    if (effectLower.includes("pan right") || effectLower.includes("tracking")) return filters.pan_right;
+    if (effectLower.includes("pan left")) return filters.pan_left;
+    if (effectLower.includes("pan")) return filters.pan_right; // generic pan
+
+    return filters[effect] || filters.ken_burns;
 };
 
 /**
@@ -154,61 +162,76 @@ export const concatenateSceneVideos = async (sceneVideoPaths, outputPath) => {
 };
 
 /**
- * Add background music and burn subtitles into final video
+ * Add background music into final video
  * @param {string} videoPath - Input concatenated video
  * @param {string|null} musicPath - Optional background music MP3
- * @param {string|null} subtitlePath - Optional SRT subtitle file
  * @param {string} outputPath - Final output MP4
  */
-export const addMusicAndSubtitles = async (videoPath, musicPath, subtitlePath, outputPath) => {
+export const addMusic = async (videoPath, musicPath, outputPath) => {
     const hasMusicFile = musicPath && fs.existsSync(musicPath);
-    const hasSubtitleFile = subtitlePath && fs.existsSync(subtitlePath);
 
-    // If no music and no subtitles, just copy
-    if (!hasMusicFile && !hasSubtitleFile) {
+    // If no music, just copy
+    if (!hasMusicFile) {
         fs.copyFileSync(videoPath, outputPath);
-        console.log(`✅ Final video (no music/subtitles): ${path.basename(outputPath)}`);
+        console.log(`✅ Final video (no music): ${path.basename(outputPath)}`);
         return outputPath;
     }
 
     const command = ffmpeg().input(videoPath);
 
-    const outputOptions = ["-c:v libx264", "-preset fast", "-crf 21", "-pix_fmt yuv420p", "-y"];
+    const outputOptions = ["-c:v libx264", "-preset fast", "-crf 21", "-pix_fmt yuv420p", "-y", "-map 0:v"];
     const complexFilterParts = [];
 
     // Audio stream handling (mix music + narration, or copy narration)
-    if (hasMusicFile) {
-        command.input(musicPath);
-        complexFilterParts.push(
-            `[1:a]volume=${MUSIC_VOLUME},aloop=loop=-1:size=2e+09[music]`,
-            `[0:a][music]amix=inputs=2:duration=first:dropout_transition=2[audio_out]`
-        );
-        outputOptions.push("-map [audio_out]", "-c:a aac", "-b:a 192k");
-    } else {
-        outputOptions.push("-map 0:a", "-c:a aac", "-b:a 192k");
-    }
+    command.input(musicPath);
+    complexFilterParts.push(
+        `[1:a]volume=${MUSIC_VOLUME},aloop=loop=-1:size=2e+09[music]`,
+        `[0:a][music]amix=inputs=2:duration=first:dropout_transition=2[audio_out]`
+    );
+    outputOptions.push("-map [audio_out]", "-c:a aac", "-b:a 192k");
 
-    // Video stream handling (burn subtitles or copy video)
-    if (hasSubtitleFile) {
-        const escapedSrtPath = subtitlePath
-            .replace(/\\/g, "/")
-            .replace(/:/g, "\\:");
-        const subtitleFilter = `subtitles='${escapedSrtPath}':force_style='FontName=Arial,FontSize=18,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=3,Outline=2,Shadow=1,MarginV=40,Alignment=2'`;
-
-        complexFilterParts.push(`[0:v]${subtitleFilter}[v_out]`);
-        outputOptions.push("-map [v_out]");
-    } else {
-        outputOptions.push("-map 0:v");
-    }
-
-    if (complexFilterParts.length > 0) {
-        command.complexFilter(complexFilterParts);
-    }
-
+    command.complexFilter(complexFilterParts);
     command.outputOptions(outputOptions).output(outputPath);
 
     await runFfmpeg(command);
-    console.log(`✅ Final video with music/subtitles: ${path.basename(outputPath)}`);
+    console.log(`✅ Final video with music: ${path.basename(outputPath)}`);
+    return outputPath;
+};
+
+/**
+ * Concatenate multiple audio files into one
+ * @param {string[]} audioPaths - Ordered list of audio file paths
+ * @param {string} outputPath - Output concatenated audio path
+ */
+export const concatenateAudioFiles = async (audioPaths, outputPath) => {
+    if (audioPaths.length === 0) throw new Error("No audio files to concatenate");
+
+    if (audioPaths.length === 1) {
+        fs.copyFileSync(audioPaths[0], outputPath);
+        return outputPath;
+    }
+
+    const concatListPath = path.join(path.dirname(outputPath), `concat-audio-${Date.now()}.txt`);
+    const concatContent = audioPaths
+        .map((p) => `file '${p.replace(/\\/g, "/")}'`)
+        .join("\n");
+    fs.writeFileSync(concatListPath, concatContent, "utf-8");
+
+    const command = ffmpeg()
+        .input(concatListPath)
+        .inputOptions(["-f concat", "-safe 0"])
+        .outputOptions([
+            "-c:a libmp3lame",
+            "-b:a 192k",
+            "-y"
+        ])
+        .output(outputPath);
+
+    await runFfmpeg(command);
+
+    if (fs.existsSync(concatListPath)) fs.unlinkSync(concatListPath);
+
+    console.log(`✅ Audio files concatenated → ${path.basename(outputPath)}`);
     return outputPath;
 };
 

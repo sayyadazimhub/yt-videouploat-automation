@@ -15,7 +15,6 @@ export const createProjectStructure = (projectId) => {
         path.join(projectDir, "scenes"),
         path.join(projectDir, "images"),
         path.join(projectDir, "audio"),
-        path.join(projectDir, "subtitles"),
         path.join(projectDir, "scenes-video"),
     ];
     for (const dir of dirs) {
@@ -47,9 +46,6 @@ export const getScenePaths = (projectId, sceneNumber) => {
 
 export const getStoryPath = (projectId) =>
     path.join(getProjectDir(projectId), "story.json");
-
-export const getSubtitlePath = (projectId) =>
-    path.join(getProjectDir(projectId), "subtitles", "subtitles.srt");
 
 export const getFinalVideoPath = (projectId) =>
     path.join(getProjectDir(projectId), "final-video.mp4");

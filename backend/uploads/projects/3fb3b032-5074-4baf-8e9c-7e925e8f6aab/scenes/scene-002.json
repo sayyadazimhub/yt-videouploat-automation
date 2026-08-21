@@ -1,0 +1,43 @@
+{
+  "sceneNumber": 2,
+  "duration": 12,
+  "storyBeat": "Verification & Realization",
+  "location": "TeaStall",
+  "charactersInScene": [
+    "Rohan",
+    "Kabir"
+  ],
+  "currentSceneState": "Exactly 24 hours later, the event predicted by the photo happens in real life.",
+  "previousSceneState": "Rohan and Kabir were confused by the photograph.",
+  "nextSceneHint": "Rohan decides to test the camera on a bigger target.",
+  "continuityNotes": "Kabir is wearing the same floral hoodie as yesterday.",
+  "narration": "ठीक २४ घंटे बाद... चाय की टपरी पर वही हुआ जो तस्वीर में था! रोहन समझ गया, यह कैमरा ठीक २४ घंटे आगे का भविष्य दिखाता है।",
+  "captions": [
+    "२४ घंटे बाद...",
+    "भविष्य सच साबित हुआ!"
+  ],
+  "dialogue": [
+    {
+      "character": "Kabir",
+      "text": "अरे नहीं! मेरी पसंदीदा हुडी पर गर्म चाय गिर गई!"
+    },
+    {
+      "character": "Rohan",
+      "text": "कबीर! समय देख... ठीक २४ घंटे! यह कैमरा कल का सच दिखाता है!"
+    }
+  ],
+  "visualPrompt": "At a bustling Indian roadside tea stall, Kabir, a 23-year-old South Asian male with a short fade haircut, neatly trimmed beard, wearing a bright floral hoodie, accidentally bumps his elbow and spills hot tea all over his chest. Rohan, a 22-year-old South Asian male with messy black hair, wearing a blue denim jacket over a yellow t-shirt, holds up yesterday's polaroid photo right next to Kabir, matching the pose and stain perfectly.",
+  "visualBeats": [
+    "Kabir spills tea on himself in slow motion.",
+    "Rohan places the original polaroid photo side-by-side with real life.",
+    "Both characters look at each other with wide eyes."
+  ],
+  "cameraMovement": "tracking shot of spilled tea -> split-focus macro shot comparing photo to reality",
+  "mood": "Drama, Comedy, Suspense",
+  "soundEffects": [
+    "Tea splash sound",
+    "Gasp sound",
+    "Street traffic background noise"
+  ],
+  "musicMood": "Tense synth build-up turning into a lighthearted comedic sting"
+}

@@ -1,0 +1,42 @@
+{
+  "sceneNumber": 3,
+  "duration": 12,
+  "storyBeat": "Mystery & High Stakes Setup",
+  "location": "CityBankExterior",
+  "charactersInScene": [
+    "Rohan",
+    "Kabir"
+  ],
+  "currentSceneState": "Rohan takes a photo of the city bank, revealing a major crime that will happen tomorrow.",
+  "previousSceneState": "They verified the camera's powers at the tea stall.",
+  "nextSceneHint": "They set out to stop the predicted bank robbery.",
+  "continuityNotes": "Rohan holds the vintage instant camera.",
+  "narration": "अपनी थ्योरी को पक्का करने के लिए रोहन ने सिटी बैंक के बाहर एक तस्वीर खींची। और जब फोटो बाहर आई, तो दोनों के पसीने छूट गए!",
+  "captions": [
+    "अगली तस्वीर...",
+    "कल शाम ४ बजे डाका!"
+  ],
+  "dialogue": [
+    {
+      "character": "Rohan",
+      "text": "कबीर... कल शाम ठीक ४ बजे इस बैंक में डाका पड़ने वाला है!"
+    },
+    {
+      "character": "Kabir",
+      "text": "क्या?! अब हम क्या करें, हीरो बनें या भाग जाएँ?"
+    }
+  ],
+  "visualPrompt": "Outside a modern glass bank building, Rohan, a 22-year-old South Asian male with messy black hair, wearing a blue denim jacket over a yellow t-shirt, takes a photo with his vintage instant camera. Beside him, Kabir, a 23-year-old South Asian male in his floral hoodie, watches as the photo develops, showing a masked robber running out of the bank doors with a red duffel bag under dark stormy skies.",
+  "visualBeats": [
+    "Rohan snaps a picture of the quiet bank building.",
+    "The developing photo slowly reveals a masked robber running out.",
+    "Rohan points at the clock tower in the photo showing 4:00 PM."
+  ],
+  "cameraMovement": "low angle camera tilt down -> extreme close-up on the polaroid reveal",
+  "mood": "Suspense, Mystery",
+  "soundEffects": [
+    "Dramatic ticking clock sound",
+    "Thunder rumble in distance"
+  ],
+  "musicMood": "High suspense orchestrations with pulsing bass lines"
+}

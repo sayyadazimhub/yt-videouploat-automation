@@ -1,18 +1,16 @@
 import AiVideoProject from "../models/aiVideoProject.model.js";
 import { generateImage } from "./imageService.js";
-import { generateAudio } from "./ttsService.js";
-import { generateSubtitles } from "./subtitleService.js";
+import { generateSceneAudio } from "./ttsService.js";
 import { buildScenes, getCinematicEffect } from "./sceneService.js";
 import {
     createSceneVideo,
     concatenateSceneVideos,
-    addMusicAndSubtitles,
+    addMusic,
     getMediaDuration,
 } from "./ffmpegService.js";
 import {
     createProjectStructure,
     getScenePaths,
-    getSubtitlePath,
     getFinalVideoPath,
     getFinalVideoUrl,
     getMusicPath,
@@ -39,7 +37,7 @@ const updateStatus = async (projectId, status, progress, progressLabel, errorMes
  * @param {Object} storyData - Full story JSON
  */
 export const runVideoPipeline = async (projectId, storyData) => {
-    const scenes = buildScenes(storyData.scenes, storyData.style);
+    const scenes = buildScenes(storyData.scenes, storyData.style, storyData.mood);
     const language = storyData.language || "English";
     const sceneVideoPaths = [];
 
@@ -57,6 +55,24 @@ export const runVideoPipeline = async (projectId, storyData) => {
     }
 
     try {
+        // ── STEP 0: Strict Pre-flight Validation
+        await updateStatus(projectId, "VALIDATING", 5, "Validating story JSON strict adherence...");
+        
+        const totalDuration = scenes.reduce((sum, s) => sum + (s.duration || 15), 0);
+        console.log(`🔍 Validation: Expected ~${storyData.duration}s, Actual Scenes Sum = ${totalDuration}s`);
+        
+        scenes.forEach((scene, i) => {
+            if (!scene.narration && (!scene.dialogue || scene.dialogue.length === 0)) {
+                throw new Error(`Scene ${i+1} validation failed: Missing both narration and dialogue.`);
+            }
+            if (!scene.captions || scene.captions.length === 0) {
+                console.warn(`⚠️ Scene ${i+1} validation warning: Missing captions.`);
+            }
+            if (!scene.cameraMovement) {
+                console.warn(`⚠️ Scene ${i+1} validation warning: Missing cameraMovement.`);
+            }
+        });
+
         // ── STEP 1: Ensure project folder structure exists
         createProjectStructure(projectId);
 
@@ -95,7 +111,7 @@ export const runVideoPipeline = async (projectId, storyData) => {
                 console.log(`⏭️  Skipping audio for scene ${scene.sceneNumber} (already exists)`);
             } else {
                 try {
-                    await generateAudio(scene.narration, paths.audio, language);
+                    await generateSceneAudio(scene, paths.audio, language, storyData);
                 } catch (audioErr) {
                     console.error(`❌ Audio gen failed for scene ${scene.sceneNumber}: ${audioErr.message}`);
                 }
@@ -105,19 +121,15 @@ export const runVideoPipeline = async (projectId, storyData) => {
             await updateStatus(projectId, "GENERATING_AUDIO", audioProgress, `Generating audio: ${sceneLabel}`);
         }
 
-        // ── STEP 4: Generate subtitles
-        await updateStatus(projectId, "GENERATING_AUDIO", 52, "Generating subtitles...");
-        const subtitlePath = getSubtitlePath(projectId);
-        generateSubtitles(scenes, subtitlePath);
-
         // ── STEP 5: Create per-scene video clips
         await updateStatus(projectId, "GENERATING_VIDEO", 55, "Creating scene videos...");
 
         for (let i = 0; i < scenes.length; i++) {
             const scene = scenes[i];
             const paths = getScenePaths(projectId, scene.sceneNumber);
-            const effect = scene.cinematicEffect || getCinematicEffect(i);
-            let duration = scene.duration || 10;
+            // Use requested camera movement, fallback to generic effect if missing
+            const effect = scene.cameraMovement || scene.cinematicEffect || getCinematicEffect(i);
+            let duration = scene.duration || 15;
 
             // Verify source files exist
             if (!fileExists(paths.image)) {
@@ -168,8 +180,8 @@ export const runVideoPipeline = async (projectId, storyData) => {
         const concatPath = getFinalVideoPath(projectId).replace("final-video.mp4", "concat-temp.mp4");
         await concatenateSceneVideos(sceneVideoPaths, concatPath);
 
-        // ── STEP 7: Add music + burn subtitles
-        await updateStatus(projectId, "GENERATING_VIDEO", 85, "Adding music & subtitles...");
+        // ── STEP 7: Add music
+        await updateStatus(projectId, "GENERATING_VIDEO", 85, "Adding music...");
 
         const musicMood = scenes[0]?.musicMood || "dramatic";
         const musicPath = getMusicPath(musicMood);
@@ -179,10 +191,9 @@ export const runVideoPipeline = async (projectId, storyData) => {
             console.warn("⚠️  No music file found. Proceeding without background music.");
         }
 
-        await addMusicAndSubtitles(
+        await addMusic(
             concatPath,
             musicPath,
-            fileExists(subtitlePath) ? subtitlePath : null,
             finalVideoPath
         );
 
