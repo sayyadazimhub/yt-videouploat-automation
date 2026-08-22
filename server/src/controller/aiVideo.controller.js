@@ -276,7 +276,7 @@ export const getVideoController = async (req, res) => {
             success: true,
             data: {
                 videoUrl: project.video_path,
-                fullUrl: `${process.env.BACKEND_URL || "http://localhost:5000"}${project.video_path}`,
+                fullUrl: `${process.env.BACKEND_URL}${project.video_path}`,
             },
         });
     } catch (error) {

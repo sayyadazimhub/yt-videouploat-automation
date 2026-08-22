@@ -27,12 +27,12 @@ export const callbackController = async (req, res) => {
         const tokens = await getTokens(code);
         if (!tokens.refresh_token) {
             // Already authorized, perhaps? Need refresh token.
-            return res.redirect("http://localhost:3000/gallery?youtubeError=NoRefreshToken");
+            return res.redirect(`${process.env.FRONTEND_URL}/gallery?youtubeError=NoRefreshToken`);
         }
 
         const channelInfo = await getChannelInfo(tokens.refresh_token);
         if (!channelInfo) {
-            return res.redirect("http://localhost:3000/gallery?youtubeError=NoChannel");
+            return res.redirect(`${process.env.FRONTEND_URL}/gallery?youtubeError=NoChannel`);
         }
 
         // Save to DB
@@ -59,7 +59,7 @@ export const callbackController = async (req, res) => {
                     window.opener.postMessage("youtube_connected", "*");
                     window.close();
                 } else {
-                    window.location.href = "http://localhost:3000";
+                    window.location.href = '${process.env.FRONTEND_URL}';
                 }
             </script>
         `);

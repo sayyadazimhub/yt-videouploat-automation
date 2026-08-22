@@ -10,7 +10,7 @@ import {
   getProject
 } from "../../utils/api";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function YouTubeSection({ projectId, initialYouTubeStatus }) {
   const [status, setStatus] = useState("loading"); // loading, disconnected, connected, uploading, processing, completed, error
