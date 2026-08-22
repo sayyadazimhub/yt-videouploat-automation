@@ -1,0 +1,167 @@
+{
+  "title": "अंतिम तस्वीर",
+  "description": "अंतरिक्ष में अकेले तैनात एक अंतरिक्ष यात्री पृथ्वी की तस्वीर खींचता है। फोटो जूम करने पर उसे पृथ्वी के ठीक ऊपर एक विशाल, टिमटिमाता हुआ कर्सर दिखाई देता है, जो एक खौफनाक रहस्य खोलता है।",
+  "language": "Hindi",
+  "duration": 60,
+  "style": "Storytelling",
+  "mood": "Drama, Mystery, Suspense, Emotional",
+  "characterBible": {
+    "Kabir": "35-year-old South Asian male astronaut with sharp dark brown eyes, short cropped black hair, slight stubble, wearing a sleek white and dark grey pressurized space suit with a national flag patch on the shoulder."
+  },
+  "characterGenders": {
+    "Kabir": "male"
+  },
+  "locationBible": {
+    "Orbital Observation Module": "A sleek futuristic spacecraft interior with curved metallic walls, illuminated by cool blue neon accent strips and dark high-resolution display monitors. A massive glass viewport offers a panoramic view of Earth below."
+  },
+  "importantObjects": [
+    "High-resolution digital space camera",
+    "Central display monitor",
+    "Blinking white text cursor over Earth"
+  ],
+  "scenes": [
+    {
+      "sceneNumber": 1,
+      "duration": 12,
+      "storyBeat": "Establish isolation and taking the photograph",
+      "location": "Orbital Observation Module",
+      "charactersInScene": [
+        "Kabir"
+      ],
+      "currentSceneState": "Kabir stands in front of the cupola window, capturing a detailed photo of Earth with his heavy space camera.",
+      "previousSceneState": "None",
+      "nextSceneHint": "Kabir inspects the photo on his display screen.",
+      "continuityNotes": "Kabir wears his dark grey and white space suit. Earth is brightly lit outside.",
+      "narration": "अंतरिक्ष के इस शांत सन्नाटे में, कबीर महीनों से अकेला पृथ्वी की निगरानी कर रहा था। आज उसने अपनी प्यारी दुनिया की एक आखिरी तस्वीर ली।",
+      "captions": [
+        "अकेलापन और सन्नाटा",
+        "पृथ्वी की एक खास तस्वीर"
+      ],
+      "dialogue": [],
+      "visualPrompt": "Cinematic shot inside the Orbital Observation Module. Kabir, a 35-year-old South Asian male astronaut with sharp dark brown eyes, short cropped black hair, slight stubble, wearing a sleek white and dark grey pressurized space suit, holds a high-resolution space camera up to his eye, pointing it out of the large curved window at the glowing blue Earth.",
+      "visualBeats": [
+        "Kabir adjusts the lens of the camera.",
+        "The shutter clicks, casting a momentary reflection on the glass.",
+        "Kabir slowly lowers the camera, looking out into space with a weary, emotional expression."
+      ],
+      "cameraMovement": "Slow tracking shot pan from behind Kabir toward the curved window looking at Earth",
+      "mood": "Drama, Emotional",
+      "soundEffects": [
+        "Low hum of spacecraft life support",
+        "Camera shutter click"
+      ],
+      "musicMood": "Melancholic atmospheric synths"
+    },
+    {
+      "sceneNumber": 2,
+      "duration": 15,
+      "storyBeat": "Discovery of the glitch",
+      "location": "Orbital Observation Module",
+      "charactersInScene": [
+        "Kabir"
+      ],
+      "currentSceneState": "Kabir connects his camera to the main console display to inspect the photo detail.",
+      "previousSceneState": "Kabir snapped the photograph of Earth.",
+      "nextSceneHint": "Kabir zooms into the image to investigate a strange anomaly.",
+      "continuityNotes": "Monitor screen displays the ultra-high resolution photograph of Earth.",
+      "narration": "लेकिन जैसे ही उसने डिजिटल फोटो को मुख्य मॉनिटर पर लोड किया, उसकी नज़र एक छोटी सी अजीब सी चीज़ पर पड़ी।",
+      "captions": [
+        "कुछ असामान्य...",
+        "संदेह की शुरुआत"
+      ],
+      "dialogue": [
+        {
+          "character": "Kabir",
+          "text": "कंट्रोल, फोटो सेंड कर रहा हूँ... पर यह सेंसर रिफ्लेक्शन कैसा है?"
+        }
+      ],
+      "visualPrompt": "Medium close-up inside the Orbital Observation Module. Kabir, a 35-year-old South Asian male astronaut with short cropped black hair and a slight stubble, stands over a dark glossy terminal screen. The illuminated high-resolution photograph of Earth glows on the display. Kabir leans closer, his eyebrows furrowing in confusion.",
+      "visualBeats": [
+        "The high-res image renders on the high-tech screen.",
+        "Kabir's finger taps the glass screen to inspect a specific spot over the atmosphere.",
+        "A faint, small white vertical rectangle pulses rhythmically over the clouds."
+      ],
+      "cameraMovement": "Slow push-in shot toward Kabir's intensely focused face",
+      "mood": "Mystery, Suspense",
+      "soundEffects": [
+        "Digital beep sound",
+        "Static crackle over radio"
+      ],
+      "musicMood": "Tense low drone and subtle piano notes"
+    },
+    {
+      "sceneNumber": 3,
+      "duration": 18,
+      "storyBeat": "Investigation and escalation",
+      "location": "Orbital Observation Module",
+      "charactersInScene": [
+        "Kabir"
+      ],
+      "currentSceneState": "Kabir zooms in to 400% on the image, uncovering a gigantic blinking text cursor floating in Earth's orbit.",
+      "previousSceneState": "Kabir noticed a faint anomaly on the main monitor.",
+      "nextSceneHint": "The cursor begins to move, revealing the disturbing reality.",
+      "continuityNotes": "The camera displays the magnified view showing the distinct white vertical blinking bar over Earth's atmosphere.",
+      "narration": "उसने फोटो को जूम इन किया। बादलों के ठीक ऊपर... एक विशाल, चमकदार सफ़ेद कर्सर लगातार ब्लिंक कर रहा था। जैसे हमारी पूरी दुनिया किसी स्क्रीन पर चल रही हो।",
+      "captions": [
+        "विशाल कर्सर",
+        "क्या यह एक भ्रम है?"
+      ],
+      "dialogue": [
+        {
+          "character": "Kabir",
+          "text": "यह कोई कैमरा लेंस एरर नहीं है... यह असली है! यह ब्लिंक कर रहा है!"
+        }
+      ],
+      "visualPrompt": "Over-the-shoulder shot inside the Orbital Observation Module. Kabir, a 35-year-old South Asian male astronaut wearing a white and dark grey space suit, stares wide-eyed at the screen. The monitor shows a extreme close-up of Earth's blue atmosphere where a massive, pristine white text cursor blinks ON and OFF in perfect rhythmic cadence above the clouds.",
+      "visualBeats": [
+        "Kabir swipes his hands across the touch console to zoom in further.",
+        "The display reveals the sharp edges of the blinking cursor hovering directly over Asia.",
+        "Kabir breathes heavily, stepping back in shock as sweat glistens on his forehead."
+      ],
+      "cameraMovement": "Rapid push-in on the monitor screen followed by a quick tilt up to Kabir's shocked face",
+      "mood": "Mystery, Suspense, Drama",
+      "soundEffects": [
+        "Heartbeat echoing loudly",
+        "Rhythmic electronic pulse ticking with the blinking cursor"
+      ],
+      "musicMood": "Building suspenseful orchestral strings"
+    },
+    {
+      "sceneNumber": 4,
+      "duration": 15,
+      "storyBeat": "Climax and chilling cliffhanger",
+      "location": "Orbital Observation Module",
+      "charactersInScene": [
+        "Kabir"
+      ],
+      "currentSceneState": "As Kabir looks out the window, the giant cursor becomes visible to his bare eyes over Earth and starts moving.",
+      "previousSceneState": "Kabir discovered the blinking cursor on his digital screen.",
+      "nextSceneHint": "None",
+      "continuityNotes": "Visible white cursor hovering directly in space above Earth out of the window.",
+      "narration": "और फिर... वह कर्सर हिलने लगा। एक ऐसा खौफनाक सच, जिसके आगे इंसान की समझ खत्म हो जाती है।",
+      "captions": [
+        "सच्चाई का पर्दाफाश",
+        "ब्लिंक... और अंत"
+      ],
+      "dialogue": [
+        {
+          "character": "Kabir",
+          "text": "भगवान हमारी रक्षा करे..."
+        }
+      ],
+      "visualPrompt": "Wide cinematic shot inside the Orbital Observation Module. Kabir, a 35-year-old South Asian male astronaut in a white and dark grey space suit, drops his hand from the console and looks directly out the massive observation window. Outside, high above the real planet Earth, a colossal translucent white vertical cursor blinks into existence in deep space and slowly shifts to the right.",
+      "visualBeats": [
+        "Kabir turns slowly toward the giant cupola window.",
+        "Outside, the giant cursor blinks once, twice, and begins to drag across the atmosphere.",
+        "The scene cuts to black right as the Earth's view flickers slightly like a display screen."
+      ],
+      "cameraMovement": "Slow wide tracking back camera movement, framing Kabir small against the immense terrifying phenomenon outside",
+      "mood": "Suspense, Drama, Mystery",
+      "soundEffects": [
+        "Deep reverberating bass drop",
+        "Sudden eerie silence"
+      ],
+      "musicMood": "Haunting, climaxing suspense soundscape fading into quiet dark resonance"
+    }
+  ]
+}

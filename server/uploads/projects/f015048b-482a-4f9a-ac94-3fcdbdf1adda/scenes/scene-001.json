@@ -1,0 +1,32 @@
+{
+  "sceneNumber": 1,
+  "duration": 12,
+  "storyBeat": "Establish isolation and taking the photograph",
+  "location": "Orbital Observation Module",
+  "charactersInScene": [
+    "Kabir"
+  ],
+  "currentSceneState": "Kabir stands in front of the cupola window, capturing a detailed photo of Earth with his heavy space camera.",
+  "previousSceneState": "None",
+  "nextSceneHint": "Kabir inspects the photo on his display screen.",
+  "continuityNotes": "Kabir wears his dark grey and white space suit. Earth is brightly lit outside.",
+  "narration": "अंतरिक्ष के इस शांत सन्नाटे में, कबीर महीनों से अकेला पृथ्वी की निगरानी कर रहा था। आज उसने अपनी प्यारी दुनिया की एक आखिरी तस्वीर ली।",
+  "captions": [
+    "अकेलापन और सन्नाटा",
+    "पृथ्वी की एक खास तस्वीर"
+  ],
+  "dialogue": [],
+  "visualPrompt": "Cinematic shot inside the Orbital Observation Module. Kabir, a 35-year-old South Asian male astronaut with sharp dark brown eyes, short cropped black hair, slight stubble, wearing a sleek white and dark grey pressurized space suit, holds a high-resolution space camera up to his eye, pointing it out of the large curved window at the glowing blue Earth.",
+  "visualBeats": [
+    "Kabir adjusts the lens of the camera.",
+    "The shutter clicks, casting a momentary reflection on the glass.",
+    "Kabir slowly lowers the camera, looking out into space with a weary, emotional expression."
+  ],
+  "cameraMovement": "Slow tracking shot pan from behind Kabir toward the curved window looking at Earth",
+  "mood": "Drama, Emotional",
+  "soundEffects": [
+    "Low hum of spacecraft life support",
+    "Camera shutter click"
+  ],
+  "musicMood": "Melancholic atmospheric synths"
+}

@@ -1,0 +1,37 @@
+{
+  "sceneNumber": 4,
+  "duration": 15,
+  "storyBeat": "Climax and chilling cliffhanger",
+  "location": "Orbital Observation Module",
+  "charactersInScene": [
+    "Kabir"
+  ],
+  "currentSceneState": "As Kabir looks out the window, the giant cursor becomes visible to his bare eyes over Earth and starts moving.",
+  "previousSceneState": "Kabir discovered the blinking cursor on his digital screen.",
+  "nextSceneHint": "None",
+  "continuityNotes": "Visible white cursor hovering directly in space above Earth out of the window.",
+  "narration": "और फिर... वह कर्सर हिलने लगा। एक ऐसा खौफनाक सच, जिसके आगे इंसान की समझ खत्म हो जाती है।",
+  "captions": [
+    "सच्चाई का पर्दाफाश",
+    "ब्लिंक... और अंत"
+  ],
+  "dialogue": [
+    {
+      "character": "Kabir",
+      "text": "भगवान हमारी रक्षा करे..."
+    }
+  ],
+  "visualPrompt": "Wide cinematic shot inside the Orbital Observation Module. Kabir, a 35-year-old South Asian male astronaut in a white and dark grey space suit, drops his hand from the console and looks directly out the massive observation window. Outside, high above the real planet Earth, a colossal translucent white vertical cursor blinks into existence in deep space and slowly shifts to the right.",
+  "visualBeats": [
+    "Kabir turns slowly toward the giant cupola window.",
+    "Outside, the giant cursor blinks once, twice, and begins to drag across the atmosphere.",
+    "The scene cuts to black right as the Earth's view flickers slightly like a display screen."
+  ],
+  "cameraMovement": "Slow wide tracking back camera movement, framing Kabir small against the immense terrifying phenomenon outside",
+  "mood": "Suspense, Drama, Mystery",
+  "soundEffects": [
+    "Deep reverberating bass drop",
+    "Sudden eerie silence"
+  ],
+  "musicMood": "Haunting, climaxing suspense soundscape fading into quiet dark resonance"
+}
