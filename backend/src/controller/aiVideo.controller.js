@@ -41,7 +41,7 @@ export const generateStoryController = async (req, res) => {
         // Create project in DB (no video generation yet)
         const projectId = generateProjectId();
         await AiVideoProject.create({
-            id: projectId,
+            _id: projectId,
             user_id: req.user?.id || null,
             prompt: prompt.trim(),
             style: storyStyle,
@@ -86,7 +86,7 @@ export const startGenerationController = async (req, res) => {
             return res.status(400).json({ success: false, message: "projectId is required." });
         }
 
-        const project = await AiVideoProject.findByPk(projectId);
+        const project = await AiVideoProject.findById(projectId);
         if (!project) {
             return res.status(404).json({ success: false, message: "Project not found." });
         }
@@ -107,7 +107,8 @@ export const startGenerationController = async (req, res) => {
         }
 
         // Update status to generating
-        await AiVideoProject.update(
+        await AiVideoProject.updateOne(
+            { _id: projectId },
             {
                 status: "GENERATING_STORY",
                 progress: 5,
@@ -115,8 +116,7 @@ export const startGenerationController = async (req, res) => {
                 error_message: null,
                 video_path: null,
                 story_json: JSON.stringify(storyData),
-            },
-            { where: { id: projectId } }
+            }
         );
 
         // Save updated story files
@@ -146,10 +146,7 @@ export const startGenerationController = async (req, res) => {
 // ─────────────────────────────────────────────
 export const getProjectsController = async (req, res) => {
     try {
-        const projects = await AiVideoProject.findAll({
-            where: { status: "COMPLETED" },
-            order: [["updatedAt", "DESC"]],
-        });
+        const projects = await AiVideoProject.find({ status: "COMPLETED" }).sort({ updatedAt: -1 });
 
         const formattedProjects = projects.map(p => {
             let storyData = null;
@@ -188,7 +185,7 @@ export const getProjectsController = async (req, res) => {
 export const getProjectController = async (req, res) => {
     try {
         const { projectId } = req.params;
-        const project = await AiVideoProject.findByPk(projectId);
+        const project = await AiVideoProject.findById(projectId);
 
         if (!project) {
             return res.status(404).json({ success: false, message: "Project not found." });
@@ -231,9 +228,7 @@ export const getProjectController = async (req, res) => {
 export const getStatusController = async (req, res) => {
     try {
         const { projectId } = req.params;
-        const project = await AiVideoProject.findByPk(projectId, {
-            attributes: ["id", "status", "progress", "progress_label", "video_path", "error_message", "updatedAt"],
-        });
+        const project = await AiVideoProject.findById(projectId).select("id status progress progress_label video_path error_message updatedAt");
 
         if (!project) {
             return res.status(404).json({ success: false, message: "Project not found." });
@@ -263,9 +258,7 @@ export const getStatusController = async (req, res) => {
 export const getVideoController = async (req, res) => {
     try {
         const { projectId } = req.params;
-        const project = await AiVideoProject.findByPk(projectId, {
-            attributes: ["id", "status", "video_path"],
-        });
+        const project = await AiVideoProject.findById(projectId).select("id status video_path");
 
         if (!project) {
             return res.status(404).json({ success: false, message: "Project not found." });
@@ -298,7 +291,7 @@ export const getVideoController = async (req, res) => {
 export const deleteProjectController = async (req, res) => {
     try {
         const { projectId } = req.params;
-        const project = await AiVideoProject.findByPk(projectId);
+        const project = await AiVideoProject.findById(projectId);
 
         if (!project) {
             return res.status(404).json({ success: false, message: "Project not found." });
@@ -308,7 +301,7 @@ export const deleteProjectController = async (req, res) => {
         deleteProjectFiles(projectId);
 
         // Delete from database
-        await AiVideoProject.destroy({ where: { id: projectId } });
+        await AiVideoProject.findByIdAndDelete(projectId);
 
         return res.status(200).json({
             success: true,

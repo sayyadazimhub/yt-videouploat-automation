@@ -24,7 +24,7 @@ const updateStatus = async (projectId, status, progress, progressLabel, errorMes
     try {
         const update = { status, progress, progress_label: progressLabel };
         if (errorMessage) update.error_message = errorMessage;
-        await AiVideoProject.update(update, { where: { id: projectId } });
+        await AiVideoProject.updateOne({ _id: projectId }, update);
         console.log(`📊 [${projectId.slice(0, 8)}] ${status} (${progress}%) — ${progressLabel}`);
     } catch (err) {
         console.error(`❌ Failed to update project status: ${err.message}`);
@@ -42,7 +42,7 @@ export const runVideoPipeline = async (projectId, storyData) => {
     const sceneVideoPaths = [];
 
     // Fetch project to get format
-    const project = await AiVideoProject.findByPk(projectId);
+    const project = await AiVideoProject.findById(projectId);
     const format = project?.format || "9:16";
     let videoWidth = 1080;
     let videoHeight = 1920; // Default 9:16 (Shorts/Reels)
@@ -207,14 +207,14 @@ export const runVideoPipeline = async (projectId, storyData) => {
 
         // ── STEP 8: Mark as completed
         const videoUrl = getFinalVideoUrl(projectId);
-        await AiVideoProject.update(
+        await AiVideoProject.updateOne(
+            { _id: projectId },
             {
                 status: "COMPLETED",
                 progress: 100,
                 progress_label: "Video generation complete!",
                 video_path: videoUrl,
-            },
-            { where: { id: projectId } }
+            }
         );
 
         console.log(`🎉 Project ${projectId.slice(0, 8)} completed! → ${videoUrl}`);

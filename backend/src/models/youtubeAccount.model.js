@@ -1,35 +1,29 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/db.js";
+import mongoose from "mongoose";
 
-const YoutubeAccount = sequelize.define(
-    "YoutubeAccount",
+const YoutubeAccountSchema = new mongoose.Schema(
     {
-        id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
-        },
         user_id: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
+            type: Number,
+            default: null,
         },
         channel_id: {
-            type: DataTypes.STRING(255),
-            allowNull: false,
+            type: String,
+            required: true,
         },
         channel_title: {
-            type: DataTypes.STRING(255),
-            allowNull: false,
+            type: String,
+            required: true,
         },
         refresh_token: {
-            type: DataTypes.TEXT,
-            allowNull: false,
+            type: String,
+            required: true,
         },
     },
     {
-        tableName: "youtube_accounts",
         timestamps: true,
     }
 );
+
+const YoutubeAccount = mongoose.model("YoutubeAccount", YoutubeAccountSchema);
 
 export default YoutubeAccount;

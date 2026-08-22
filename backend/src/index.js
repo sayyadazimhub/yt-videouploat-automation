@@ -7,7 +7,6 @@ import youtubeRoute from "./routes/youtube.route.js";
 import AiVideoProject from "./models/aiVideoProject.model.js";
 import YoutubeAccount from "./models/youtubeAccount.model.js";
 import { runVideoPipeline } from "./services/videoService.js";
-import { Op } from "sequelize";
 
 dotenv.config();
 
@@ -43,18 +42,16 @@ app.use((err, req, res, next) => {
 
 dbconnected().then(async () => {
     try {
-        const stuckProjects = await AiVideoProject.findAll({
-            where: {
-                status: {
-                    [Op.in]: ["GENERATING_STORY", "GENERATING_SCENES", "GENERATING_IMAGES", "GENERATING_AUDIO", "GENERATING_VIDEO"]
-                }
+        const stuckProjects = await AiVideoProject.find({
+            status: {
+                $in: ["GENERATING_STORY", "GENERATING_SCENES", "GENERATING_IMAGES", "GENERATING_AUDIO", "GENERATING_VIDEO"]
             }
         });
         
         if (stuckProjects.length > 0) {
             console.log(`🧹 Cleaning up ${stuckProjects.length} stuck projects...`);
             for (const project of stuckProjects) {
-                await project.update({
+                await AiVideoProject.updateOne({ _id: project._id }, {
                     status: "FAILED",
                     error_message: "Generation was interrupted due to server restart.",
                     progress_label: "Failed (Server Restart)"

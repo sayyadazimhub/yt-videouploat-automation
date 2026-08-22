@@ -36,9 +36,9 @@ export const callbackController = async (req, res) => {
         }
 
         // Save to DB
-        let account = await YoutubeAccount.findOne({ where: { user_id: HARDCODED_USER_ID } });
+        let account = await YoutubeAccount.findOne({ user_id: HARDCODED_USER_ID });
         if (account) {
-            await account.update({
+            await YoutubeAccount.updateOne({ _id: account._id }, {
                 channel_id: channelInfo.id,
                 channel_title: channelInfo.title,
                 refresh_token: tokens.refresh_token
@@ -71,7 +71,7 @@ export const callbackController = async (req, res) => {
 
 export const getStatusController = async (req, res) => {
     try {
-        const account = await YoutubeAccount.findOne({ where: { user_id: HARDCODED_USER_ID } });
+        const account = await YoutubeAccount.findOne({ user_id: HARDCODED_USER_ID });
         if (!account) {
             return res.json({ connected: false });
         }
@@ -99,7 +99,7 @@ export const getStatusController = async (req, res) => {
 
 export const disconnectController = async (req, res) => {
     try {
-        await YoutubeAccount.destroy({ where: { user_id: HARDCODED_USER_ID } });
+        await YoutubeAccount.deleteOne({ user_id: HARDCODED_USER_ID });
         res.json({ success: true });
     } catch (error) {
         console.error("❌ YouTube Disconnect error:", error);
@@ -111,7 +111,7 @@ export const generateMetadataController = async (req, res) => {
     try {
         const { projectId } = req.body;
         
-        const project = await AiVideoProject.findByPk(projectId);
+        const project = await AiVideoProject.findById(projectId);
         if (!project) return res.status(404).json({ success: false, message: "Project not found" });
 
         const metadata = await generateMetadata(project.prompt);
@@ -126,7 +126,7 @@ export const uploadController = async (req, res) => {
     try {
         const { projectId, title, description, tags, privacyStatus } = req.body;
         
-        const project = await AiVideoProject.findByPk(projectId);
+        const project = await AiVideoProject.findById(projectId);
         if (!project) return res.status(404).json({ success: false, message: "Project not found" });
         const videoFilePath = path.join(process.cwd(), project.video_path.startsWith('/') ? project.video_path.slice(1) : project.video_path);
 
@@ -134,7 +134,7 @@ export const uploadController = async (req, res) => {
             return res.status(400).json({ success: false, message: "Video file not found: " + videoFilePath });
         }
 
-        const account = await YoutubeAccount.findOne({ where: { user_id: HARDCODED_USER_ID } });
+        const account = await YoutubeAccount.findOne({ user_id: HARDCODED_USER_ID });
         if (!account) {
             return res.status(400).json({ success: false, message: "YouTube account is not connected." });
         }
@@ -143,7 +143,7 @@ export const uploadController = async (req, res) => {
         // Since we need to update the status and progress, we can do it asynchronously and return immediately.
         
         // Update project status to UPLOADING
-        await project.update({
+        await AiVideoProject.updateOne({ _id: project._id }, {
             youtube_status: "UPLOADING",
             youtube_title: title,
             youtube_description: description,
@@ -153,7 +153,7 @@ export const uploadController = async (req, res) => {
         // Background task
         uploadVideo(account.refresh_token, videoFilePath, { title, description, tags, privacyStatus })
             .then(async (result) => {
-                await project.update({
+                await AiVideoProject.updateOne({ _id: project._id }, {
                     youtube_video_id: result.id,
                     youtube_url: `https://www.youtube.com/watch?v=${result.id}`,
                     youtube_status: "COMPLETED",
@@ -162,7 +162,7 @@ export const uploadController = async (req, res) => {
             })
             .catch(async (error) => {
                 console.error("❌ Background Upload error:", error);
-                await project.update({
+                await AiVideoProject.updateOne({ _id: project._id }, {
                     youtube_status: "FAILED",
                     error_message: "YouTube upload failed: " + error.message
                 });
@@ -182,7 +182,7 @@ export const uploadController = async (req, res) => {
 export const getUploadStatusController = async (req, res) => {
     try {
         const { projectId } = req.params;
-        const project = await AiVideoProject.findByPk(projectId);
+        const project = await AiVideoProject.findById(projectId);
         if (!project) return res.status(404).json({ success: false, message: "Project not found" });
 
         res.json({

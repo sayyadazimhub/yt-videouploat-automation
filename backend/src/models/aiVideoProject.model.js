@@ -1,52 +1,49 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/db.js";
+import mongoose from "mongoose";
 
-const AiVideoProject = sequelize.define(
-    "AiVideoProject",
+const AiVideoProjectSchema = new mongoose.Schema(
     {
-        id: {
-            type: DataTypes.STRING(36),
-            primaryKey: true,
-            allowNull: false,
+        _id: {
+            type: String,
+            required: true,
         },
         user_id: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
+            type: Number,
+            default: null,
         },
         prompt: {
-            type: DataTypes.TEXT,
-            allowNull: false,
+            type: String,
+            required: true,
         },
         style: {
-            type: DataTypes.STRING(100),
-            allowNull: true,
-            defaultValue: "Cinematic",
+            type: String,
+            default: "Cinematic",
         },
         mood: {
-            type: DataTypes.STRING(255),
-            allowNull: true,
+            type: String,
+            default: null,
         },
         language: {
-            type: DataTypes.STRING(50),
-            allowNull: false,
-            defaultValue: "English",
+            type: String,
+            required: true,
+            default: "English",
         },
         duration: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 60,
+            type: Number,
+            required: true,
+            default: 60,
         },
         format: {
-            type: DataTypes.STRING(10),
-            allowNull: false,
-            defaultValue: "9:16",
+            type: String,
+            required: true,
+            default: "9:16",
         },
         story_json: {
-            type: DataTypes.TEXT("long"),
-            allowNull: true,
+            type: String,
+            default: null,
         },
         status: {
-            type: DataTypes.ENUM(
+            type: String,
+            enum: [
                 "PENDING",
                 "GENERATING_STORY",
                 "GENERATING_SCENES",
@@ -55,69 +52,81 @@ const AiVideoProject = sequelize.define(
                 "GENERATING_VIDEO",
                 "COMPLETED",
                 "FAILED"
-            ),
-            allowNull: false,
-            defaultValue: "PENDING",
+            ],
+            required: true,
+            default: "PENDING",
         },
         progress: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0,
+            type: Number,
+            required: true,
+            default: 0,
         },
         progress_label: {
-            type: DataTypes.STRING(255),
-            allowNull: true,
+            type: String,
+            default: null,
         },
         video_path: {
-            type: DataTypes.STRING(500),
-            allowNull: true,
+            type: String,
+            default: null,
         },
         error_message: {
-            type: DataTypes.TEXT,
-            allowNull: true,
+            type: String,
+            default: null,
         },
         youtube_video_id: {
-            type: DataTypes.STRING(255),
-            allowNull: true,
+            type: String,
+            default: null,
         },
         youtube_url: {
-            type: DataTypes.STRING(500),
-            allowNull: true,
+            type: String,
+            default: null,
         },
         youtube_status: {
-            type: DataTypes.ENUM(
+            type: String,
+            enum: [
                 "NOT_STARTED",
                 "AUTH_REQUIRED",
                 "UPLOADING",
                 "PROCESSING",
                 "COMPLETED",
                 "FAILED"
-            ),
-            allowNull: true,
-            defaultValue: "NOT_STARTED",
+            ],
+            default: "NOT_STARTED",
         },
         youtube_privacy_status: {
-            type: DataTypes.STRING(50),
-            allowNull: true,
-            defaultValue: "private",
+            type: String,
+            default: "private",
         },
         youtube_title: {
-            type: DataTypes.STRING(255),
-            allowNull: true,
+            type: String,
+            default: null,
         },
         youtube_description: {
-            type: DataTypes.TEXT,
-            allowNull: true,
+            type: String,
+            default: null,
         },
         youtube_uploaded_at: {
-            type: DataTypes.DATE,
-            allowNull: true,
+            type: Date,
+            default: null,
         },
     },
     {
-        tableName: "ai_video_projects",
         timestamps: true,
     }
 );
+
+AiVideoProjectSchema.virtual('id').get(function() {
+    return this._id;
+});
+
+AiVideoProjectSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc, ret) => {
+        delete ret._id;
+        delete ret.__v;
+    }
+});
+
+const AiVideoProject = mongoose.model("AiVideoProject", AiVideoProjectSchema);
 
 export default AiVideoProject;
