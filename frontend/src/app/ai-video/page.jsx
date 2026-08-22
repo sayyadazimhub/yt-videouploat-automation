@@ -40,12 +40,11 @@ import {
 const STYLES = ["Cinematic", "Documentary", "Short Film", "Anime", "Storytelling", "Thriller"];
 const MOODS = ["Suspense", "Drama", "Action", "Comedy", "Mystery", "Emotional", "Horror", "Romantic"];
 const DURATIONS = [
-  { label: "30 sec", value: 30 },
   { label: "1 min", value: 60 },
   { label: "2 min", value: 120 },
   { label: "3 min", value: 180 },
 ];
-const LANGUAGES = ["English", "Hindi", "Marathi"];
+const LANGUAGES = ["Hindi", "English", "Marathi"];
 const FORMATS = [
   { label: "9:16 Shorts", sub: "1080×1920 • Reels / Shorts", value: "9:16" },
   { label: "16:9 Landscape", sub: "1920×1080 • YouTube", value: "16:9" },
@@ -82,14 +81,14 @@ function SectionLabel({ children }) {
   );
 }
 
-function GoldButton({ onClick, disabled, loading, children, className = "" }) {
+function PrimaryButton({ onClick, disabled, loading, children, className = "" }) {
   return (
     <button
       onClick={onClick}
       disabled={disabled || loading}
-      className={`flex items-center justify-center gap-2 px-6 py-3 bg-[#D4AF37] text-black font-bold rounded-xl transition-all duration-200 hover:bg-[#e8c84e] hover:shadow-lg hover:shadow-[#D4AF37]/25 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${className}`}
+      className={`flex items-center justify-center gap-2.5 px-6 py-3.5 bg-gradient-to-r from-[#06b6d4] to-[#3b82f6] text-white font-extrabold rounded-xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none ${className}`}
     >
-      {loading && <Loader2 size={16} className="animate-spin" />}
+      {loading && <Loader2 size={18} className="animate-spin" />}
       {children}
     </button>
   );
@@ -100,7 +99,7 @@ function OutlineButton({ onClick, disabled, children, className = "" }) {
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`flex items-center justify-center gap-2 px-6 py-3 bg-transparent border border-[#2a2a2a] text-slate-300 font-semibold rounded-xl transition-all duration-200 hover:border-[#D4AF37]/50 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed ${className}`}
+      className={`flex items-center justify-center gap-2.5 px-6 py-3.5 bg-transparent border border-[#333] text-slate-300 font-bold rounded-xl transition-all duration-300 hover:border-[#06b6d4]/60 hover:text-white hover:bg-[#06b6d4]/5 hover:shadow-[0_0_15px_rgba(6,182,212,0.1)] disabled:opacity-40 disabled:cursor-not-allowed ${className}`}
     >
       {children}
     </button>
@@ -110,67 +109,73 @@ function OutlineButton({ onClick, disabled, children, className = "" }) {
 function SceneCard({ scene, index }) {
   const [expanded, setExpanded] = useState(false);
   return (
-    <div className="rounded-xl border border-[#2a2a2a] bg-[#141414] overflow-hidden">
+    <div className="rounded-xl border border-[#2a2a2a] bg-[#141414]/80 backdrop-blur-md overflow-hidden transition-all duration-300 hover:border-[#06b6d4]/30 hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[#1a1a1a] transition-colors"
+        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[#1a1a1a]/90 transition-colors"
       >
-        <div className="flex items-center gap-3">
-          <span className="w-8 h-8 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center text-[#D4AF37] text-sm font-bold flex-shrink-0">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#06b6d4]/20 to-transparent border border-[#06b6d4]/30 flex items-center justify-center text-[#06b6d4] text-sm font-black flex-shrink-0 shadow-[0_0_10px_rgba(6,182,212,0.1)]">
             {scene.sceneNumber || index + 1}
-          </span>
+          </div>
           <div>
-            <p className="text-white font-semibold text-sm line-clamp-1">
+            <p className="text-white font-bold text-sm line-clamp-1 tracking-wide">
               {scene.narration?.substring(0, 60) || "Scene narration"}...
             </p>
-            <div className="flex items-center gap-3 mt-1">
-              <span className="text-xs text-slate-500 flex items-center gap-1">
-                <Clock size={11} /> {scene.duration}s
+            <div className="flex items-center gap-3 mt-1.5">
+              <span className="text-xs text-slate-400 flex items-center gap-1 bg-[#0a0a0a] px-2 py-0.5 rounded-md border border-[#333]">
+                <Clock size={10} /> {scene.duration}s
               </span>
-              <span className="text-xs text-[#D4AF37] font-medium">{scene.mood}</span>
-              <span className="text-xs text-slate-600">{scene.cameraMovement}</span>
+              <span className="text-xs text-[#06b6d4] font-semibold bg-[#06b6d4]/10 px-2 py-0.5 rounded-md border border-[#06b6d4]/20">{scene.mood}</span>
+              <span className="text-xs text-slate-400 bg-[#0a0a0a] px-2 py-0.5 rounded-md border border-[#333]">{scene.cameraMovement}</span>
             </div>
           </div>
         </div>
-        <ChevronRight
-          size={16}
-          className={`text-slate-500 transition-transform flex-shrink-0 ${expanded ? "rotate-90" : ""}`}
-        />
+        <div className={`w-8 h-8 flex items-center justify-center rounded-full bg-[#0a0a0a] border border-[#333] transition-all duration-300 ${expanded ? "rotate-90 bg-[#06b6d4]/10 border-[#06b6d4]/30" : ""}`}>
+          <ChevronRight
+            size={16}
+            className={expanded ? "text-[#06b6d4]" : "text-slate-500"}
+          />
+        </div>
       </button>
 
       {expanded && (
-        <div className="px-5 pb-5 space-y-4 border-t border-[#2a2a2a] pt-4">
+        <div className="px-5 pb-5 space-y-5 border-t border-[#2a2a2a]/50 pt-5 bg-[#0a0a0a]/30">
           <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Narration</p>
-            <p className="text-slate-300 text-sm leading-relaxed">{scene.narration}</p>
+            <p className="text-[10px] font-black text-[#06b6d4] uppercase tracking-widest mb-2 flex items-center gap-1.5"><Mic size={12}/> Narration</p>
+            <p className="text-slate-200 text-sm leading-relaxed border-l-2 border-[#06b6d4]/30 pl-3">{scene.narration}</p>
           </div>
           {scene.dialogue?.length > 0 && (
             <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Dialogue</p>
-              {scene.dialogue.map((d, i) => (
-                <p key={i} className="text-sm text-slate-300">
-                  <span className="text-[#D4AF37] font-semibold">{d.character}:</span> "{d.text}"
-                </p>
-              ))}
+              <p className="text-[10px] font-black text-[#06b6d4] uppercase tracking-widest mb-2 flex items-center gap-1.5"><Mic size={12}/> Dialogue</p>
+              <div className="space-y-1.5 border-l-2 border-[#06b6d4]/30 pl-3">
+                {scene.dialogue.map((d, i) => (
+                  <p key={i} className="text-sm text-slate-300">
+                    <span className="text-[#06b6d4] font-bold">{d.character}:</span> "{d.text}"
+                  </p>
+                ))}
+              </div>
             </div>
           )}
           <div>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Visual Prompt</p>
-            <p className="text-slate-400 text-sm italic leading-relaxed">{scene.visualPrompt}</p>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5"><ImageIcon size={12}/> Visual Prompt</p>
+            <p className="text-slate-400 text-sm italic leading-relaxed bg-[#111] p-3 rounded-lg border border-[#222]">{scene.visualPrompt}</p>
           </div>
           {scene.soundEffects?.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 pt-1">
               {scene.soundEffects.map((sfx, i) => (
-                <span key={i} className="px-2.5 py-1 rounded-full bg-[#1e1e1e] border border-[#2a2a2a] text-xs text-slate-400">
-                  🔊 {sfx}
+                <span key={i} className="px-3 py-1 rounded-full bg-[#111] border border-[#333] text-xs text-slate-300 font-medium flex items-center gap-1.5 shadow-sm">
+                  <span className="text-[#06b6d4]">🔊</span> {sfx}
                 </span>
               ))}
             </div>
           )}
           {scene.musicMood && (
-            <div className="flex items-center gap-2">
-              <Music size={13} className="text-[#D4AF37]" />
-              <span className="text-xs text-slate-500">Music: <span className="text-slate-300">{scene.musicMood}</span></span>
+            <div className="flex items-center gap-2 pt-1">
+              <div className="w-6 h-6 rounded-full bg-[#06b6d4]/10 flex items-center justify-center">
+                <Music size={12} className="text-[#06b6d4]" />
+              </div>
+              <span className="text-xs text-slate-500 font-medium">Music Track: <span className="text-slate-300">{scene.musicMood}</span></span>
             </div>
           )}
         </div>
@@ -188,32 +193,32 @@ function ProgressStep({ step, status, isCurrent }) {
   const isPending = stepIndex > currentIndex;
 
   return (
-    <div className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
-      isActive ? "bg-[#D4AF37]/10 border border-[#D4AF37]/30" :
-      isDone ? "opacity-60" : "opacity-30"
+    <div className={`flex items-center gap-4 p-4 rounded-2xl transition-all duration-500 ${
+      isActive ? "bg-gradient-to-r from-[#06b6d4]/10 to-transparent border border-[#06b6d4]/30 shadow-[0_0_20px_rgba(6,182,212,0.1)] scale-[1.02]" :
+      isDone ? "bg-emerald-500/5 border border-emerald-500/20" : "bg-transparent border border-transparent opacity-50"
     }`}>
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-        isDone ? "bg-emerald-500/20 border border-emerald-500/40" :
-        isActive ? "bg-[#D4AF37]/20 border border-[#D4AF37]/40" :
-        "bg-[#1a1a1a] border border-[#2a2a2a]"
+      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-500 ${
+        isDone ? "bg-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]" :
+        isActive ? "bg-[#06b6d4] text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]" :
+        "bg-[#1a1a1a] border border-[#333] text-slate-500"
       }`}>
         {isDone ? (
-          <CheckCircle2 size={15} className="text-emerald-400" />
+          <CheckCircle2 size={18} />
         ) : isActive ? (
-          <Loader2 size={15} className="text-[#D4AF37] animate-spin" />
+          <Loader2 size={18} className="animate-spin" />
         ) : (
-          <Circle size={12} className="text-slate-600" />
+          <Icon size={16} />
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <p className={`text-sm font-semibold ${
-          isDone ? "text-emerald-400" : isActive ? "text-[#D4AF37]" : "text-slate-600"
+        <p className={`text-sm font-bold tracking-wide ${
+          isDone ? "text-emerald-400" : isActive ? "text-[#06b6d4]" : "text-slate-400"
         }`}>
           {step.label}
         </p>
       </div>
-      {isDone && <CheckCircle2 size={14} className="text-emerald-400 flex-shrink-0" />}
-      {isActive && <Loader2 size={14} className="text-[#D4AF37] animate-spin flex-shrink-0" />}
+      {isDone && <CheckCircle2 size={16} className="text-emerald-500/50 flex-shrink-0" />}
+      {isActive && <Loader2 size={16} className="text-[#06b6d4]/50 animate-spin flex-shrink-0" />}
     </div>
   );
 }
@@ -227,7 +232,7 @@ export default function AiVideoPage() {
     style: "Cinematic",
     mood: ["Drama"],
     duration: 60,
-    language: "English",
+    language: "Hindi",
     format: "9:16",
   });
   const [isGeneratingStory, setIsGeneratingStory] = useState(false);
@@ -397,50 +402,47 @@ export default function AiVideoPage() {
   // ── Render ─────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f]">
+    <div className="min-h-screen bg-[#0a0a0a] selection:bg-cyan-500/30">
       {/* Hero Banner */}
-      <div className="relative overflow-hidden border-b border-[#1a1a1a]">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/5 via-transparent to-transparent pointer-events-none" />
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#D4AF37]/3 rounded-full blur-[150px] pointer-events-none -translate-y-1/2 translate-x-1/3" />
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 relative z-10">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <span className="flex h-2 w-2 rounded-full bg-[#D4AF37] animate-ping absolute" />
-              <span className="flex h-2 w-2 rounded-full bg-[#D4AF37] relative" />
-              <span className="text-[10px] font-bold text-[#D4AF37] uppercase tracking-widest ml-2">
+      <div className="relative overflow-hidden border-b border-[#2a2a2a]/50 bg-[#0f0f0f]">
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-600/10 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-br from-cyan-500/10 to-transparent rounded-full blur-[120px] pointer-events-none -translate-y-1/2 translate-x-1/3" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 relative z-10">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3 bg-[#1a1a1a]/80 backdrop-blur-md border border-[#2a2a2a] px-4 py-2 rounded-full shadow-lg">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400"></span>
+              </span>
+              <span className="text-[10px] font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 uppercase tracking-[0.2em]">
                 AI-Powered • Gemini + FFmpeg
               </span>
             </div>
-            <a href="/gallery" className="flex items-center gap-2 px-4 py-2 bg-[#1a1a1a] border border-[#2a2a2a] text-slate-300 rounded-full text-xs font-bold hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]/50 hover:text-[#D4AF37] transition-all">
-              <Film size={14} />
-              My Gallery
-            </a>
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white leading-tight tracking-tight">
-            Story to{" "}
-            <span className="text-gold-gradient">Cinematic Video</span>
+          <h1 className="text-5xl md:text-6xl font-black text-white leading-[1.1] tracking-tight mb-3">
+            AI <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500">Cinematic Studio</span>
           </h1>
-          <p className="text-slate-400 mt-3 text-lg max-w-2xl">
-            Type your story idea and watch AI transform it into a fully narrated, scored, cinematic short video — automatically.
-          </p>
+          {/* <p className="text-slate-400 text-lg md:text-xl max-w-xl font-light">
+            Instantly turn your ideas into fully narrated, cinematic short videos.
+          </p> */}
 
           {/* Stage indicator */}
-          <div className="flex items-center gap-2 mt-6">
-            {["Form", "Story Preview", "Video Generation"].map((s, i) => {
+          <div className="flex flex-wrap items-center gap-3 mt-10">
+            {["Story Idea", "Review & Edit", "Generation"].map((s, i) => {
               const stageKeys = ["form", "preview", "progress"];
               const isActive = stageKeys[i] === stage;
               const isDone = stageKeys.indexOf(stage) > i;
               return (
-                <div key={s} className="flex items-center gap-2">
-                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                    isActive ? "bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/40" :
-                    isDone ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" :
-                    "bg-[#1a1a1a] text-slate-600 border border-[#2a2a2a]"
+                <div key={s} className="flex items-center gap-3">
+                  <div className={`flex items-center gap-2.5 px-4 py-2 rounded-full text-xs font-bold transition-all duration-500 ${
+                    isActive ? "bg-gradient-to-r from-blue-600/20 to-cyan-500/10 text-cyan-400 border border-cyan-500/50 shadow-[0_0_20px_rgba(34,211,238,0.15)] scale-[1.02]" :
+                    isDone ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30" :
+                    "bg-[#141414] text-slate-500 border border-[#2a2a2a]"
                   }`}>
-                    {isDone ? <CheckCircle2 size={11} /> : <span>{i + 1}</span>}
+                    {isDone ? <CheckCircle2 size={14} className="text-emerald-400" /> : <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] ${isActive ? "bg-cyan-500 text-black" : "bg-[#2a2a2a] text-slate-400"}`}>{i + 1}</span>}
                     {s}
                   </div>
-                  {i < 2 && <ChevronRight size={14} className="text-slate-700" />}
+                  {i < 2 && <ChevronRight size={16} className="text-[#333]" />}
                 </div>
               );
             })}
@@ -448,7 +450,7 @@ export default function AiVideoPage() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
 
         {/* ═══════════════════════════════════════════════
             STAGE 1 — FORM
@@ -456,111 +458,126 @@ export default function AiVideoPage() {
         {stage === "form" && (
           <div className="space-y-8 fade-up">
 
-            {/* Story Idea */}
-            <div className="glass-card p-6">
-              <SectionLabel>Story Idea *</SectionLabel>
-              <textarea
-                id="story-prompt"
-                rows={4}
-                value={formData.prompt}
-                onChange={(e) => setFormData({ ...formData, prompt: e.target.value })}
-                placeholder='e.g. "A story about criminality in a cinematic way. Add suspense, drama, fun, and unexpected twists."'
-                className="w-full bg-[#0f0f0f] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-[#D4AF37]/50 focus:ring-1 focus:ring-[#D4AF37]/30 transition-all resize-none text-sm leading-relaxed"
-              />
-              <p className="text-slate-600 text-xs mt-2">{formData.prompt.length} characters (minimum 10)</p>
-            </div>
-
-            {/* Language */}
-            <div className="glass-card p-6">
-              <SectionLabel>Language</SectionLabel>
-              <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
-                {LANGUAGES.map((l) => (
-                  <button
-                    key={l}
-                    id={`lang-${l.toLowerCase()}`}
-                    onClick={() => setFormData({ ...formData, language: l })}
-                    className={`px-4 py-3 rounded-xl text-sm font-semibold border transition-all text-center ${
-                      formData.language === l
-                        ? "bg-[#D4AF37]/20 border-[#D4AF37]/60 text-[#D4AF37]"
-                        : "bg-[#141414] border-[#2a2a2a] text-slate-400 hover:border-[#3a3a3a] hover:text-white"
-                    }`}
-                  >
-                    {l}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Mood */}
-            <div className="glass-card p-6">
-              <SectionLabel>Mood (select multiple)</SectionLabel>
-              <div className="flex flex-wrap gap-2.5">
-                {MOODS.map((m) => (
-                  <button
-                    key={m}
-                    id={`mood-${m.toLowerCase()}`}
-                    onClick={() => toggleMood(m)}
-                    className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
-                      formData.mood.includes(m)
-                        ? "bg-[#D4AF37]/20 border-[#D4AF37] text-[#D4AF37]"
-                        : "bg-[#141414] border-[#2a2a2a] text-slate-400 hover:border-[#3a3a3a] hover:text-white"
-                    }`}
-                  >
-                    {m}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Duration + Format */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="glass-card p-6">
-                <SectionLabel>Duration</SectionLabel>
-                <div className="grid grid-cols-2 gap-2">
-                  {DURATIONS.map((d) => (
-                    <button
-                      key={d.value}
-                      id={`duration-${d.value}`}
-                      onClick={() => setFormData({ ...formData, duration: d.value })}
-                      className={`px-3 py-3 rounded-xl text-sm font-bold border transition-all flex items-center justify-center gap-1.5 ${
-                        formData.duration === d.value
-                          ? "bg-[#D4AF37]/20 border-[#D4AF37]/60 text-[#D4AF37]"
-                          : "bg-[#141414] border-[#2a2a2a] text-slate-400 hover:border-[#3a3a3a] hover:text-white"
-                      }`}
-                    >
-                      <Clock size={13} />
-                      {d.label}
-                    </button>
-                  ))}
+            {/* Form Split Layout */}
+            <div className="grid lg:grid-cols-12 gap-6">
+              
+              {/* Left Column: Story Idea */}
+              <div className="lg:col-span-8 flex flex-col">
+                <div className="glass-card p-8 hover:border-[#06b6d4]/30 transition-colors duration-500 group flex flex-col h-full">
+                  <SectionLabel>Story Idea <span className="text-[#06b6d4]">*</span></SectionLabel>
+                  <textarea
+                    id="story-prompt"
+                    value={formData.prompt}
+                    onChange={(e) => setFormData({ ...formData, prompt: e.target.value })}
+                    placeholder='e.g. "A story about criminality in a cinematic way. Add suspense, drama, fun, and unexpected twists."'
+                    className="w-full flex-1 min-h-[250px] bg-[#0a0a0a]/50 border border-[#333] rounded-2xl px-5 py-4 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-[#06b6d4]/60 focus:ring-4 focus:ring-[#06b6d4]/10 transition-all duration-300 resize-none text-lg leading-relaxed group-hover:bg-[#0a0a0a]/80 shadow-inner"
+                  />
+                  <div className="flex justify-between items-center mt-4">
+                    <p className="text-slate-500 text-xs font-medium">{formData.prompt.length} characters (minimum 10)</p>
+                    {formData.prompt.length >= 10 && <CheckCircle2 size={16} className="text-emerald-500" />}
+                  </div>
                 </div>
               </div>
 
-              <div className="glass-card p-6">
-                <SectionLabel>Video Format</SectionLabel>
-                <div className="flex flex-col gap-2">
-                  {FORMATS.map((f) => (
-                    <button
-                      key={f.value}
-                      id={`format-${f.value.replace(":", "-")}`}
-                      onClick={() => setFormData({ ...formData, format: f.value })}
-                      className={`px-4 py-3 rounded-xl text-sm border transition-all text-left ${
-                        formData.format === f.value
-                          ? "bg-[#D4AF37]/20 border-[#D4AF37]/60"
-                          : "bg-[#141414] border-[#2a2a2a] hover:border-[#3a3a3a]"
-                      }`}
-                    >
-                      <p className={`font-bold ${formData.format === f.value ? "text-[#D4AF37]" : "text-white"}`}>
-                        {f.label}
-                      </p>
-                      <p className="text-slate-500 text-xs mt-0.5">{f.sub}</p>
-                    </button>
-                  ))}
+              {/* Right Column: Configuration Column */}
+              <div className="lg:col-span-4 flex flex-col gap-4">
+                
+                {/* Language */}
+                <div className="glass-card p-5 hover:border-[#06b6d4]/30 transition-colors duration-500">
+                  <SectionLabel>Language</SectionLabel>
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    {LANGUAGES.map((l) => (
+                      <button
+                        key={l}
+                        id={`lang-${l.toLowerCase()}`}
+                        onClick={() => setFormData({ ...formData, language: l })}
+                        className={`px-2 py-2.5 rounded-xl text-xs font-bold border transition-all duration-300 text-center relative overflow-hidden ${
+                          formData.language === l
+                            ? "bg-[#06b6d4]/10 border-[#06b6d4] text-[#06b6d4] shadow-[0_0_15px_rgba(6,182,212,0.15)] scale-[1.02]"
+                            : "bg-[#111] border-[#333] text-slate-400 hover:border-[#555] hover:text-slate-200 hover:bg-[#1a1a1a]"
+                        }`}
+                      >
+                        {formData.language === l && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#06b6d4]/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />}
+                        <span className="relative z-10">{l}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Mood */}
+                <div className="glass-card p-5 hover:border-[#06b6d4]/30 transition-colors duration-500">
+                  <SectionLabel>Mood</SectionLabel>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {MOODS.map((m) => (
+                      <button
+                        key={m}
+                        id={`mood-${m.toLowerCase()}`}
+                        onClick={() => toggleMood(m)}
+                        className={`px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all duration-300 ${
+                          formData.mood.includes(m)
+                            ? "bg-[#06b6d4]/10 border-[#06b6d4] text-[#06b6d4] shadow-[0_0_15px_rgba(6,182,212,0.15)] scale-[1.05]"
+                            : "bg-[#111] border-[#333] text-slate-400 hover:border-[#555] hover:text-slate-200 hover:bg-[#1a1a1a]"
+                        }`}
+                      >
+                        {m}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Duration */}
+                <div className="glass-card p-5 hover:border-[#06b6d4]/30 transition-colors duration-500">
+                  <SectionLabel>Duration</SectionLabel>
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    {DURATIONS.map((d) => (
+                      <button
+                        key={d.value}
+                        id={`duration-${d.value}`}
+                        onClick={() => setFormData({ ...formData, duration: d.value })}
+                        className={`px-1 py-2.5 rounded-xl text-[11px] font-bold border transition-all duration-300 flex flex-row items-center justify-center gap-1 ${
+                          formData.duration === d.value
+                            ? "bg-[#06b6d4]/10 border-[#06b6d4] text-[#06b6d4] shadow-[0_0_15px_rgba(6,182,212,0.15)] scale-[1.05]"
+                            : "bg-[#111] border-[#333] text-slate-400 hover:border-[#555] hover:text-slate-200 hover:bg-[#1a1a1a]"
+                        }`}
+                      >
+                        <Clock size={12} className={formData.duration === d.value ? "text-[#06b6d4]" : "text-slate-500"} />
+                        {d.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Video Format */}
+                <div className="glass-card p-5 hover:border-[#06b6d4]/30 transition-colors duration-500">
+                  <SectionLabel>Format</SectionLabel>
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    {FORMATS.map((f) => (
+                      <button
+                        key={f.value}
+                        id={`format-${f.value.replace(":", "-")}`}
+                        onClick={() => setFormData({ ...formData, format: f.value })}
+                        className={`px-3 py-2.5 rounded-xl text-xs border transition-all duration-300 flex items-center gap-3 ${
+                          formData.format === f.value
+                            ? "bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_15px_rgba(6,182,212,0.15)] scale-[1.02]"
+                            : "bg-[#111] border-[#333] hover:border-[#555] hover:bg-[#1a1a1a]"
+                        }`}
+                      >
+                        <div className={`w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 ${formData.format === f.value ? "bg-[#06b6d4]/20 text-[#06b6d4]" : "bg-[#222] text-slate-500"}`}>
+                          {f.value === "9:16" ? <div className="w-1.5 h-3 border-2 border-current rounded-sm" /> : <div className="w-3 h-1.5 border-2 border-current rounded-sm" />}
+                        </div>
+                        <p className={`font-bold leading-tight ${formData.format === f.value ? "text-[#06b6d4]" : "text-slate-300"}`}>
+                          {f.label}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
               </div>
             </div>
 
             {/* Generate Button */}
-            <GoldButton
+            <PrimaryButton
               id="generate-story-btn"
               onClick={handleGenerateStory}
               loading={isGeneratingStory}
@@ -574,7 +591,7 @@ export default function AiVideoPage() {
                   Generate Story with AI
                 </>
               )}
-            </GoldButton>
+            </PrimaryButton>
           </div>
         )}
 
@@ -582,97 +599,106 @@ export default function AiVideoPage() {
             STAGE 2 — STORY PREVIEW
         ════════════════════════════════════════════════ */}
         {stage === "preview" && story && (
-          <div className="space-y-6 fade-up">
+          <div className="grid lg:grid-cols-12 gap-6 fade-up">
+            
+            {/* Left Column: Details & Actions */}
+            <div className="lg:col-span-4 flex flex-col gap-4">
+              
+              {/* Story Header */}
+              <div className="glass-card p-6 flex-1 flex flex-col hover:border-[#06b6d4]/30 transition-colors duration-500">
+                <div className="flex items-center gap-2 mb-3">
+                  <Clapperboard size={16} className="text-[#06b6d4]" />
+                  <span className="text-xs font-bold text-[#06b6d4] uppercase tracking-widest">Story Details</span>
+                </div>
+                <h2 className="text-xl font-extrabold text-white mb-2">{story.title}</h2>
+                <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-1">{story.description}</p>
+                
+                {/* Stats */}
+                <div className="space-y-2 mt-auto">
+                  <div className="flex justify-between items-center px-3 py-2 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a]">
+                    <span className="text-xs text-slate-500">Duration</span>
+                    <span className="text-xs text-slate-200 font-medium flex items-center gap-1.5"><Clock size={12}/> {story.duration}s</span>
+                  </div>
+                  <div className="flex justify-between items-center px-3 py-2 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a]">
+                    <span className="text-xs text-slate-500">Scenes</span>
+                    <span className="text-xs text-slate-200 font-medium">{story.scenes?.length || 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center px-3 py-2 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a]">
+                    <span className="text-xs text-slate-500">Language</span>
+                    <span className="text-xs text-slate-200 font-medium">{story.language}</span>
+                  </div>
+                </div>
+              </div>
 
-            {/* Story Header */}
-            <div className="glass-card p-6">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Clapperboard size={16} className="text-[#D4AF37]" />
-                    <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-widest">Generated Story</span>
-                  </div>
-                  <h2 className="text-2xl font-extrabold text-white mb-2">{story.title}</h2>
-                  <p className="text-slate-400 text-sm leading-relaxed">{story.description}</p>
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <OutlineButton onClick={handleRegenerate} className="w-full text-[11px] px-2 py-3">
+                    <RefreshCw size={14} />
+                    Regenerate
+                  </OutlineButton>
+                  <OutlineButton onClick={handleToggleEdit} className="w-full text-[11px] px-2 py-3">
+                    <Edit3 size={14} />
+                    {editMode ? "Cancel" : "Edit JSON"}
+                  </OutlineButton>
                 </div>
-                <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                  <div className="px-3 py-1.5 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] text-xs text-slate-400 flex items-center gap-1.5">
-                    <Clock size={11} />
-                    {story.duration}s total
-                  </div>
-                  <div className="px-3 py-1.5 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] text-xs text-slate-400">
-                    {story.scenes?.length || 0} scenes
-                  </div>
-                  <div className="px-3 py-1.5 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] text-xs text-slate-400">
-                    {story.language}
-                  </div>
-                </div>
+                <PrimaryButton
+                  id="generate-video-btn"
+                  onClick={handleStartGeneration}
+                  loading={isStartingGeneration}
+                  className="w-full py-3.5"
+                >
+                  {!isStartingGeneration && <Film size={15} />}
+                  Generate Video
+                </PrimaryButton>
               </div>
             </div>
 
-            {/* Edit Mode Toggle */}
-            {editMode ? (
-              <div className="glass-card p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <SectionLabel>Edit Story JSON</SectionLabel>
-                  <button
-                    onClick={() => { setEditMode(false); setEditJsonError(""); }}
-                    className="text-slate-500 hover:text-white transition-colors"
-                  >
-                    <X size={16} />
-                  </button>
+            {/* Right Column: Scenes / Editor */}
+            <div className="lg:col-span-8 flex flex-col">
+              {editMode ? (
+                <div className="glass-card p-6 h-full flex flex-col hover:border-[#06b6d4]/30 transition-colors duration-500">
+                  <div className="flex items-center justify-between mb-4">
+                    <SectionLabel>Edit Story JSON</SectionLabel>
+                    <button
+                      onClick={() => { setEditMode(false); setEditJsonError(""); }}
+                      className="text-slate-500 hover:text-white transition-colors p-1 bg-[#1a1a1a] rounded-md border border-[#333]"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                  <textarea
+                    value={editJson}
+                    onChange={(e) => { setEditJson(e.target.value); setEditJsonError(""); }}
+                    className="w-full flex-1 bg-[#0a0a0a]/80 border border-[#2a2a2a] rounded-xl px-4 py-4 text-emerald-400 font-mono text-xs sm:text-sm focus:outline-none focus:border-[#06b6d4]/50 resize-none shadow-inner min-h-[400px]"
+                    spellCheck={false}
+                  />
+                  {editJsonError && (
+                    <p className="text-red-400 text-xs mt-3 flex items-center gap-1.5 bg-red-500/10 p-2 rounded-lg border border-red-500/20">
+                      <AlertCircle size={14} /> {editJsonError}
+                    </p>
+                  )}
+                  <div className="flex justify-end mt-4">
+                    <PrimaryButton onClick={handleToggleEdit}>
+                      Save Changes
+                    </PrimaryButton>
+                  </div>
                 </div>
-                <textarea
-                  value={editJson}
-                  onChange={(e) => { setEditJson(e.target.value); setEditJsonError(""); }}
-                  rows={20}
-                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-3 text-emerald-400 font-mono text-xs focus:outline-none focus:border-[#D4AF37]/50 resize-none"
-                  spellCheck={false}
-                />
-                {editJsonError && (
-                  <p className="text-red-400 text-xs mt-2 flex items-center gap-1.5">
-                    <AlertCircle size={12} /> {editJsonError}
-                  </p>
-                )}
-                <GoldButton onClick={handleToggleEdit} className="mt-3 w-full">
-                  Save Changes
-                </GoldButton>
-              </div>
-            ) : (
-              /* Scene Cards */
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <SectionLabel>Scene Breakdown</SectionLabel>
-                  <span className="text-xs text-slate-600">{story.scenes?.length} scenes • click to expand</span>
+              ) : (
+                <div className="glass-card p-6 h-full flex flex-col hover:border-[#06b6d4]/30 transition-colors duration-500">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+                    <SectionLabel>Scene Breakdown</SectionLabel>
+                    <span className="text-[10px] sm:text-xs text-slate-500 px-2 py-1.5 bg-[#1a1a1a] rounded-md border border-[#333] font-medium tracking-wide">
+                      {story.scenes?.length} scenes • click to expand
+                    </span>
+                  </div>
+                  <div className="space-y-3 pr-2 custom-scrollbar flex-1 h-[500px] overflow-y-auto">
+                    {story.scenes?.map((scene, i) => (
+                      <SceneCard key={i} scene={scene} index={i} />
+                    ))}
+                  </div>
                 </div>
-                {story.scenes?.map((scene, i) => (
-                  <SceneCard key={i} scene={scene} index={i} />
-                ))}
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <OutlineButton onClick={handleRegenerate} className="flex-1">
-                <RefreshCw size={15} />
-                Regenerate Story
-              </OutlineButton>
-              <OutlineButton
-                onClick={handleToggleEdit}
-                className="flex-1"
-              >
-                <Edit3 size={15} />
-                {editMode ? "Cancel Edit" : "Edit Story JSON"}
-              </OutlineButton>
-              <GoldButton
-                id="generate-video-btn"
-                onClick={handleStartGeneration}
-                loading={isStartingGeneration}
-                className="flex-1"
-              >
-                {!isStartingGeneration && <Film size={15} />}
-                Generate Video
-              </GoldButton>
+              )}
             </div>
           </div>
         )}
@@ -682,17 +708,17 @@ export default function AiVideoPage() {
         ════════════════════════════════════════════════ */}
         {stage === "progress" && (
           <div className="space-y-6 fade-up">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid lg:grid-cols-12 gap-6">
 
-              {/* Progress Tracker */}
-              <div className="glass-card p-6">
+              {/* Progress Tracker (Left Column) */}
+              <div className="lg:col-span-4 glass-card p-6 hover:border-[#06b6d4]/30 transition-colors duration-500 h-fit">
                 <div className="flex items-center gap-2 mb-5">
                   {statusData?.status === "COMPLETED" ? (
                     <CheckCircle2 size={16} className="text-emerald-400" />
                   ) : statusData?.status === "FAILED" ? (
                     <AlertCircle size={16} className="text-red-400" />
                   ) : (
-                    <Loader2 size={16} className="text-[#D4AF37] animate-spin" />
+                    <Loader2 size={16} className="text-[#06b6d4] animate-spin" />
                   )}
                   <h3 className="text-white font-bold">Generation Pipeline</h3>
                 </div>
@@ -728,7 +754,7 @@ export default function AiVideoPage() {
                     </div>
                     <div className="h-2 bg-[#1a1a1a] rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-[#D4AF37] to-[#f0d060] rounded-full transition-all duration-700"
+                        className="h-full bg-gradient-to-r from-[#06b6d4] to-[#67e8f9] rounded-full transition-all duration-700"
                         style={{ width: `${statusData.progress || 0}%` }}
                       />
                     </div>
@@ -736,10 +762,10 @@ export default function AiVideoPage() {
                 )}
               </div>
 
-              {/* Story Summary & Video Result */}
-              <div className="space-y-4">
+              {/* Story Summary & Video Result (Right Column) */}
+              <div className="lg:col-span-8 space-y-4 flex flex-col">
                 {story && (
-                  <div className="glass-card p-5">
+                  <div className="glass-card p-5 hover:border-[#06b6d4]/30 transition-colors duration-500">
                     <h4 className="text-white font-bold mb-1">{story.title}</h4>
                     <p className="text-slate-500 text-xs mb-3">{story.description}</p>
                     <div className="flex flex-wrap gap-2">
@@ -770,10 +796,10 @@ export default function AiVideoPage() {
                       className="w-full rounded-xl max-h-[400px] bg-black"
                     />
                     <div className="flex gap-3">
-                      <GoldButton onClick={handleDownload} className="flex-1">
+                      <PrimaryButton onClick={handleDownload} className="flex-1">
                         <Download size={15} />
                         Download MP4
-                      </GoldButton>
+                      </PrimaryButton>
                       <OutlineButton onClick={handleDeleteProject} className="px-4">
                         <Trash2 size={15} />
                       </OutlineButton>
@@ -793,15 +819,15 @@ export default function AiVideoPage() {
                 {/* Waiting state */}
                 {!videoUrl && statusData?.status !== "FAILED" && (
                   <div className="glass-card p-6 text-center">
-                    <div className="w-16 h-16 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-center justify-center mx-auto mb-4">
-                      <Video size={28} className="text-[#D4AF37]" />
+                    <div className="w-16 h-16 rounded-full bg-[#06b6d4]/10 border border-[#06b6d4]/20 flex items-center justify-center mx-auto mb-4">
+                      <Video size={28} className="text-[#06b6d4]" />
                     </div>
                     <p className="text-slate-400 text-sm font-medium">Video is being rendered...</p>
                     <p className="text-slate-600 text-xs mt-1">This may take 2–10 minutes depending on scene count.</p>
                     <div className="flex items-center justify-center gap-1.5 mt-4">
-                      <div className="w-2 h-2 bg-[#D4AF37] rounded-full animate-bounce [animation-delay:0ms]" />
-                      <div className="w-2 h-2 bg-[#D4AF37] rounded-full animate-bounce [animation-delay:150ms]" />
-                      <div className="w-2 h-2 bg-[#D4AF37] rounded-full animate-bounce [animation-delay:300ms]" />
+                      <div className="w-2 h-2 bg-[#06b6d4] rounded-full animate-bounce [animation-delay:0ms]" />
+                      <div className="w-2 h-2 bg-[#06b6d4] rounded-full animate-bounce [animation-delay:150ms]" />
+                      <div className="w-2 h-2 bg-[#06b6d4] rounded-full animate-bounce [animation-delay:300ms]" />
                     </div>
                   </div>
                 )}
@@ -810,7 +836,7 @@ export default function AiVideoPage() {
 
             {/* Info card */}
             <div className="rounded-xl border border-[#2a2a2a] bg-[#0f0f0f] p-4 flex items-start gap-3">
-              <AlertCircle size={15} className="text-[#D4AF37] flex-shrink-0 mt-0.5" />
+              <AlertCircle size={15} className="text-[#06b6d4] flex-shrink-0 mt-0.5" />
               <div>
                 <p className="text-slate-400 text-xs leading-relaxed">
                   <span className="text-white font-semibold">Generation runs in the background.</span>{" "}
