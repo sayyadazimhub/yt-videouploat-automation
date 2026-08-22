@@ -17,7 +17,7 @@ app.use(urlencoded({ extended: true }));
 
 app.use(
     cors({
-        origin: ["http://localhost:3000", "http://localhost:3001"],
+        origin: [process.env.FRONTEND_URL, "http://localhost:3000", "http://localhost:3001"],
         credentials: true,
     })
 );
