@@ -63,9 +63,13 @@ dbconnected().then(async () => {
     }
 });
 
-const port = process.env.PORT || 5000;
-app.listen(port, () => {
-    console.log(`🚀 Server is running on port ${port}`);
-    console.log(`   Health check: http://localhost:${port}/`);
-    console.log(`   API base:     http://localhost:${port}/api/ai-video`);
-});
+if (process.env.NODE_ENV !== "production" && process.env.VERCEL !== "1") {
+    const port = process.env.PORT || 5000;
+    app.listen(port, () => {
+        console.log(`🚀 Server is running on port ${port}`);
+        console.log(`   Health check: http://localhost:${port}/`);
+        console.log(`   API base:     http://localhost:${port}/api/ai-video`);
+    });
+}
+
+export default app;
