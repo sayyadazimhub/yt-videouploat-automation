@@ -3,6 +3,9 @@ import AiVideoProject from "../models/aiVideoProject.model.js";
 import { getAuthUrl, getTokens, getChannelInfo, uploadVideo, generateMetadata, getVideoStatus } from "../services/youtubeService.js";
 import fs from "fs";
 import path from "path";
+import os from "os";
+import { pipeline } from "stream/promises";
+import fetch from "node-fetch";
 
 // In a real multi-user app, this would come from req.user.id
 const HARDCODED_USER_ID = 1;
@@ -128,20 +131,39 @@ export const uploadController = async (req, res) => {
         
         const project = await AiVideoProject.findById(projectId);
         if (!project) return res.status(404).json({ success: false, message: "Project not found" });
-        const videoFilePath = path.join(process.cwd(), project.video_path.startsWith('/') ? project.video_path.slice(1) : project.video_path);
 
-        if (!project.video_path || !fs.existsSync(videoFilePath)) {
-            return res.status(400).json({ success: false, message: "Video file not found: " + videoFilePath });
+        if (!project.video_path) {
+            return res.status(400).json({ success: false, message: "Video file path missing in project." });
+        }
+
+        let videoFilePath = project.video_path;
+        let isRemote = false;
+
+        if (videoFilePath.startsWith('http')) {
+            isRemote = true;
+            const tempPath = path.join(os.tmpdir(), `yt-upload-${projectId}.mp4`);
+            try {
+                const response = await fetch(videoFilePath);
+                if (!response.ok) throw new Error(`Failed to fetch remote video: ${response.statusText}`);
+                await pipeline(response.body, fs.createWriteStream(tempPath));
+                videoFilePath = tempPath;
+            } catch (err) {
+                console.error("❌ Failed to download remote video:", err);
+                return res.status(500).json({ success: false, message: "Failed to download video from cloud storage." });
+            }
+        } else {
+            videoFilePath = path.join(process.cwd(), videoFilePath.startsWith('/') ? videoFilePath.slice(1) : videoFilePath);
+            if (!fs.existsSync(videoFilePath)) {
+                return res.status(400).json({ success: false, message: "Video file not found locally: " + videoFilePath });
+            }
         }
 
         const account = await YoutubeAccount.findOne({ user_id: HARDCODED_USER_ID });
         if (!account) {
+            if (isRemote && fs.existsSync(videoFilePath)) fs.unlinkSync(videoFilePath);
             return res.status(400).json({ success: false, message: "YouTube account is not connected." });
         }
 
-        // Start upload process (we'll await it, though for huge files we might want to do it in background)
-        // Since we need to update the status and progress, we can do it asynchronously and return immediately.
-        
         // Update project status to UPLOADING
         await AiVideoProject.updateOne({ _id: project._id }, {
             youtube_status: "UPLOADING",
@@ -166,6 +188,13 @@ export const uploadController = async (req, res) => {
                     youtube_status: "FAILED",
                     error_message: "YouTube upload failed: " + error.message
                 });
+            })
+            .finally(() => {
+                if (isRemote && fs.existsSync(videoFilePath)) {
+                    try {
+                        fs.unlinkSync(videoFilePath);
+                    } catch (_) {}
+                }
             });
 
         res.json({

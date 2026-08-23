@@ -12,10 +12,10 @@ import {
     createProjectStructure,
     getScenePaths,
     getFinalVideoPath,
-    getFinalVideoUrl,
     getMusicPath,
     fileExists,
 } from "./fileService.js";
+import { uploadToCloudinary } from "./cloudinaryService.js";
 
 /**
  * Update project status and progress in DB
@@ -205,8 +205,17 @@ export const runVideoPipeline = async (projectId, storyData) => {
             }
         } catch (_) {}
 
-        // ── STEP 8: Mark as completed
-        const videoUrl = getFinalVideoUrl(projectId);
+        // ── STEP 8: Upload to Cloudinary and mark as completed
+        await updateStatus(projectId, "GENERATING_VIDEO", 95, "Uploading to Cloudinary...");
+        let videoUrl;
+        try {
+            const folderName = `projects/${projectId}`;
+            videoUrl = await uploadToCloudinary(finalVideoPath, folderName);
+        } catch (uploadErr) {
+            console.error(`❌ Cloudinary Upload failed for ${projectId}: ${uploadErr.message}`);
+            throw new Error(`Upload to cloud storage failed: ${uploadErr.message}`);
+        }
+
         await AiVideoProject.updateOne(
             { _id: projectId },
             {
@@ -218,6 +227,13 @@ export const runVideoPipeline = async (projectId, storyData) => {
         );
 
         console.log(`🎉 Project ${projectId.slice(0, 8)} completed! → ${videoUrl}`);
+
+        // Clean up local files now that it's in R2
+        try {
+            const { deleteProjectFiles } = await import("./fileService.js");
+            deleteProjectFiles(projectId);
+            console.log(`🧹 Cleaned up local files for ${projectId}`);
+        } catch (_) {}
 
     } catch (err) {
         console.error(`❌ Pipeline FAILED for ${projectId}: ${err.message}`);

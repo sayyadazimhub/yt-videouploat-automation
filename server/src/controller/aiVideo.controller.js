@@ -272,11 +272,12 @@ export const getVideoController = async (req, res) => {
             });
         }
 
+        const isAbsolute = project.video_path.startsWith('http');
         return res.status(200).json({
             success: true,
             data: {
                 videoUrl: project.video_path,
-                fullUrl: `${process.env.BACKEND_URL}${project.video_path}`,
+                fullUrl: isAbsolute ? project.video_path : `${process.env.BACKEND_URL}${project.video_path}`,
             },
         });
     } catch (error) {

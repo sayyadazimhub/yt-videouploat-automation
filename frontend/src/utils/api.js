@@ -40,8 +40,11 @@ export const deleteProject = (projectId) =>
 // ── Helper ────────────────────────────────────────────────
 
 /** Build full URL for a video or image file served from backend */
-export const getMediaUrl = (relativePath) =>
-  `${API_URL}${relativePath}`;
+export const getMediaUrl = (relativePath) => {
+  if (!relativePath) return "";
+  if (relativePath.startsWith('http')) return relativePath;
+  return `${API_URL}${relativePath}`;
+};
 
 // ── YouTube APIs ──────────────────────────────────────────
 

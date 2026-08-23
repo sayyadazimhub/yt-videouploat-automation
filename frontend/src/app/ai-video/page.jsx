@@ -331,8 +331,7 @@ export default function AiVideoPage() {
 
           if (data.status === "COMPLETED") {
             clearInterval(pollRef.current);
-            const backendUrl = process.env.NEXT_PUBLIC_API_URL;
-            setVideoUrl(`${backendUrl}${data.videoPath}`);
+            setVideoUrl(getMediaUrl(data.videoPath));
             toast.success("🎬 Your cinematic video is ready!");
           } else if (data.status === "FAILED") {
             clearInterval(pollRef.current);
