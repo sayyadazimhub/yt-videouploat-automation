@@ -79,9 +79,42 @@ const getCharacterVoice = (characterName, language, storyData = {}) => {
 };
 
 /**
- * Generate audio for a single line of text
+ * Helper to map descriptive pacing/pitch to SSML percentages for Edge TTS
  */
-const generateSingleAudio = async (text, outputPath, voiceName) => {
+const mapDeliveryToSSML = (delivery) => {
+    let rate = "+0%";
+    let pitch = "+0%";
+    let volume = "+0%";
+
+    if (!delivery) return { rate, pitch, volume };
+
+    // Pace
+    if (delivery.pace === "slow") rate = "-15%";
+    else if (delivery.pace === "very slow" || delivery.pace === "slowest") rate = "-25%";
+    else if (delivery.pace === "fast") rate = "+15%";
+    else if (delivery.pace === "very fast" || delivery.pace === "urgent speech") rate = "+25%";
+    
+    // Pitch
+    if (delivery.pitch === "low") pitch = "-10%";
+    else if (delivery.pitch === "very low") pitch = "-20%";
+    else if (delivery.pitch === "high") pitch = "+10%";
+    else if (delivery.pitch === "very high") pitch = "+20%";
+
+    // Volume
+    if (delivery.volume === "soft" || delivery.volume === "whisper") volume = "-30%";
+    else if (delivery.volume === "loud" || delivery.volume === "raised voice") volume = "+20%";
+
+    return { rate, pitch, volume };
+};
+
+/**
+ * Generate audio for a single segment of text with emotion delivery
+ */
+const generateSingleAudio = async (segment, outputPath, voiceName) => {
+    // Handle both plain text (old format) and object (new format)
+    const text = typeof segment === "string" ? segment : segment.text;
+    const delivery = typeof segment === "object" ? segment.delivery : null;
+
     if (!text || text.trim().length === 0) {
         return createSilentAudio(outputPath, 1);
     }
@@ -104,7 +137,21 @@ const generateSingleAudio = async (text, outputPath, voiceName) => {
             
             if (handled) return;
 
-            const { audioStream } = tts.toStream(text);
+            // Apply SSML approximation for delivery parameters
+            const { rate, pitch, volume } = mapDeliveryToSSML(delivery);
+            let finalText = text;
+            
+            const hasVocalCues = delivery?.vocalCues?.length > 0;
+            if (hasVocalCues) {
+                const cueString = delivery.vocalCues.join(", ").replace(/_/g, " ");
+                console.log(`   🎭 Vocal Cues: [${cueString}] (Simulated via pauses)`);
+                // Simulate pauses for cues like "nervous_breath" or "sigh"
+                finalText = `... ${finalText} ...`;
+            }
+
+            // Note: msedge-tts escapes raw SSML tags, causing silent output or reading XML tags.
+            // We rely on the natural punctuation and pauses for Edge TTS.
+            const { audioStream } = tts.toStream(finalText);
             const dir = path.dirname(outputPath);
             if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
             
@@ -144,26 +191,35 @@ const generateSingleAudio = async (text, outputPath, voiceName) => {
 export const generateSceneAudio = async (scene, outputPath, language = "English", storyData = {}) => {
     const tempAudioPaths = [];
     const baseDir = path.dirname(outputPath);
-    const characterBible = storyData.characterBible || {};
 
     try {
         // 1. Generate Narration Audio
         const globalMood = storyData.mood || scene.mood || "";
         const narratorVoice = getNarratorVoice(globalMood, language);
+        
         if (scene.narration) {
-            const narPath = path.join(baseDir, `temp_narration_${scene.sceneNumber}_${Date.now()}.mp3`);
-            await generateSingleAudio(scene.narration, narPath, narratorVoice);
-            tempAudioPaths.push(narPath);
+            // Handle both string (old format) and array of segments (new format)
+            const narrations = Array.isArray(scene.narration) ? scene.narration : [scene.narration];
+            
+            for (let i = 0; i < narrations.length; i++) {
+                const segment = narrations[i];
+                const text = typeof segment === "string" ? segment : segment.text;
+                if (text && text.trim().length > 0) {
+                    const narPath = path.join(baseDir, `temp_narration_${scene.sceneNumber}_${i}_${Date.now()}.mp3`);
+                    await generateSingleAudio(segment, narPath, narratorVoice);
+                    tempAudioPaths.push(narPath);
+                }
+            }
         }
 
         // 2. Generate Dialogue Audio
         if (scene.dialogue && Array.isArray(scene.dialogue)) {
             for (let i = 0; i < scene.dialogue.length; i++) {
-                const line = scene.dialogue[i];
-                if (line.text && line.character) {
-                    const charVoice = getCharacterVoice(line.character, language, storyData);
+                const segment = scene.dialogue[i];
+                if (segment.text && segment.character) {
+                    const charVoice = getCharacterVoice(segment.character, language, storyData);
                     const dialPath = path.join(baseDir, `temp_dialogue_${scene.sceneNumber}_${i}_${Date.now()}.mp3`);
-                    await generateSingleAudio(line.text, dialPath, charVoice);
+                    await generateSingleAudio(segment, dialPath, charVoice);
                     tempAudioPaths.push(dialPath);
                 }
             }

@@ -114,9 +114,13 @@ const generateWithPollinations = async (visualPrompt, outputPath, width, height)
 
     console.log(`🎨 Pollinations: Generating image... (${width}x${height})`);
 
-    let lastError;
-    // Retry up to 3 times if it fails
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    // Add an initial random jitter (0-5 seconds) to prevent parallel scene requests from hitting the rate limit simultaneously
+    const initialJitter = Math.random() * 5000;
+    await new Promise((r) => setTimeout(r, initialJitter));
+
+    let attempt = 1;
+    // Retry infinitely with backoff if it fails (No placeholders allowed)
+    while (true) {
         try {
             const response = await fetch(url, {
                 headers: { "User-Agent": "AIVideoGenerator/1.0" },
@@ -131,7 +135,6 @@ const generateWithPollinations = async (visualPrompt, outputPath, width, height)
             }
 
             const arrayBuffer = await response.arrayBuffer();
-
             const buffer = Buffer.from(arrayBuffer);
 
             // Ensure buffer is a valid image before saving
@@ -143,16 +146,14 @@ const generateWithPollinations = async (visualPrompt, outputPath, width, height)
             console.log(`✅ Pollinations: Image saved (${Math.round(buffer.length / 1024)}KB)`);
             return outputPath;
         } catch (error) {
-            lastError = error;
             console.error(`❌ Pollinations attempt ${attempt} failed: ${error.message}`);
-            if (attempt < 3) {
-                await new Promise((r) => setTimeout(r, 2000));
-            }
+            // Cap the maximum delay at 15 seconds so we don't wait forever between tries
+            const delay = Math.min(attempt * 3000, 15000) + Math.random() * 2000;
+            console.log(`⏳ Waiting ${Math.round(delay/1000)}s before retrying Pollinations...`);
+            await new Promise((r) => setTimeout(r, delay));
+            attempt++;
         }
     }
-
-    console.warn(`⚠️ Pollinations failed (${lastError?.message}). Creating native PNG placeholder image.`);
-    return generatePlaceholder(visualPrompt, outputPath, width, height);
 };
 
 /**

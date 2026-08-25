@@ -108,6 +108,18 @@ function OutlineButton({ onClick, disabled, children, className = "" }) {
 
 function SceneCard({ scene, index }) {
   const [expanded, setExpanded] = useState(false);
+  
+  const getNarrationText = (narration) => {
+    if (!narration) return "";
+    if (typeof narration === "string") return narration;
+    if (Array.isArray(narration)) {
+      return narration.map(n => typeof n === "string" ? n : n.text || "").join(" ");
+    }
+    return String(narration);
+  };
+
+  const narrationText = getNarrationText(scene.narration);
+
   return (
     <div className="rounded-xl border border-[#2a2a2a] bg-[#141414]/80 backdrop-blur-md overflow-hidden transition-all duration-300 hover:border-[#06b6d4]/30 hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
       <button
@@ -120,7 +132,7 @@ function SceneCard({ scene, index }) {
           </div>
           <div>
             <p className="text-white font-bold text-sm line-clamp-1 tracking-wide">
-              {scene.narration?.substring(0, 60) || "Scene narration"}...
+              {narrationText.substring(0, 60) || "Scene narration"}...
             </p>
             <div className="flex items-center gap-3 mt-1.5">
               <span className="text-xs text-slate-400 flex items-center gap-1 bg-[#0a0a0a] px-2 py-0.5 rounded-md border border-[#333]">
@@ -143,7 +155,7 @@ function SceneCard({ scene, index }) {
         <div className="px-5 pb-5 space-y-5 border-t border-[#2a2a2a]/50 pt-5 bg-[#0a0a0a]/30">
           <div>
             <p className="text-[10px] font-black text-[#06b6d4] uppercase tracking-widest mb-2 flex items-center gap-1.5"><Mic size={12}/> Narration</p>
-            <p className="text-slate-200 text-sm leading-relaxed border-l-2 border-[#06b6d4]/30 pl-3">{scene.narration}</p>
+            <p className="text-slate-200 text-sm leading-relaxed border-l-2 border-[#06b6d4]/30 pl-3">{narrationText}</p>
           </div>
           {scene.dialogue?.length > 0 && (
             <div>

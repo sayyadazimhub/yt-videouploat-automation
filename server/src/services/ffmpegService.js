@@ -75,14 +75,63 @@ const buildVideoFilter = (effect, duration, width, height) => {
 };
 
 /**
- * Create a single scene video from image + audio with cinematic effects
- * @param {string} imagePath - Input image
- * @param {string} audioPath - Input WAV audio
- * @param {number} duration - Scene duration in seconds
- * @param {string} outputPath - Output MP4 path
- * @param {string} effect - Cinematic motion effect name
- * @param {number} width - Output video width
- * @param {number} height - Output video height
+ * Create a silent sub-scene video chunk from a single image
+ */
+export const createSilentVideoChunk = async (imagePath, duration, outputPath, effect = "zoom_in", width = 1080, height = 1920) => {
+    const videoFilter = buildVideoFilter(effect, duration, width, height);
+
+    const command = ffmpeg()
+        .input(imagePath)
+        .inputOptions(["-loop 1", `-t ${duration}`])
+        .complexFilter([
+            // Apply cinematic motion to image
+            `[0:v]${videoFilter},fade=t=in:st=0:d=0.5,fade=t=out:st=${Math.max(0, duration - 0.5)}:d=0.5[v]`
+        ])
+        .outputOptions([
+            "-map [v]",
+            "-c:v libx264",
+            "-preset fast",
+            "-crf 23",
+            "-r 25",
+            "-pix_fmt yuv420p",
+            `-t ${duration}`,
+            "-y",
+        ])
+        .output(outputPath);
+
+    await runFfmpeg(command);
+    console.log(`✅ Silent video chunk created: ${path.basename(outputPath)}`);
+    return outputPath;
+};
+
+/**
+ * Mux audio onto a silent video
+ */
+export const muxAudio = async (videoPath, audioPath, outputPath, duration) => {
+    const command = ffmpeg()
+        .input(videoPath)
+        .input(audioPath)
+        .complexFilter([
+            // Ensure audio matches video duration
+            `[1:a]apad,atrim=0:${duration}[a]`
+        ])
+        .outputOptions([
+            "-map 0:v",
+            "-map [a]",
+            "-c:v copy", // Copy video without re-encoding
+            "-c:a aac",
+            "-b:a 128k",
+            "-y"
+        ])
+        .output(outputPath);
+
+    await runFfmpeg(command);
+    console.log(`✅ Audio muxed into video: ${path.basename(outputPath)}`);
+    return outputPath;
+};
+
+/**
+ * Legacy: Create a single scene video from image + audio with cinematic effects
  */
 export const createSceneVideo = async (imagePath, audioPath, duration, outputPath, effect = "zoom_in", width = 1080, height = 1920) => {
     const videoFilter = buildVideoFilter(effect, duration, width, height);
@@ -132,7 +181,7 @@ export const concatenateSceneVideos = async (sceneVideoPaths, outputPath) => {
     }
 
     // Write concat list file
-    const concatListPath = path.join(path.dirname(outputPath), "concat-list.txt");
+    const concatListPath = path.join(path.dirname(outputPath), `concat-list-${Date.now()}-${Math.floor(Math.random() * 1000)}.txt`);
     const concatContent = sceneVideoPaths
         .map((p) => `file '${p.replace(/\\/g, "/")}'`)
         .join("\n");
@@ -211,7 +260,7 @@ export const concatenateAudioFiles = async (audioPaths, outputPath) => {
         return outputPath;
     }
 
-    const concatListPath = path.join(path.dirname(outputPath), `concat-audio-${Date.now()}.txt`);
+    const concatListPath = path.join(path.dirname(outputPath), `concat-audio-${Date.now()}-${Math.floor(Math.random() * 1000)}.txt`);
     const concatContent = audioPaths
         .map((p) => `file '${p.replace(/\\/g, "/")}'`)
         .join("\n");

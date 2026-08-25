@@ -38,9 +38,20 @@ export const getScenePaths = (projectId, sceneNumber) => {
     const base = getProjectDir(projectId);
     return {
         json: path.join(base, "scenes", `scene-${num}.json`),
-        image: path.join(base, "images", `scene-${num}.png`),
+        image: path.join(base, "images", `scene-${num}.png`), // Kept for legacy compatibility
         audio: path.join(base, "audio", `scene-${num}.mp3`),
         video: path.join(base, "scenes-video", `scene-${num}.mp4`),
+        videoOnly: path.join(base, "scenes-video", `scene-${num}-video_only.mp4`),
+    };
+};
+
+/** Get paths for a specific sub-beat of a scene */
+export const getSubScenePaths = (projectId, sceneNumber, beatIndex) => {
+    const num = formatSceneNumber(sceneNumber);
+    const base = getProjectDir(projectId);
+    return {
+        image: path.join(base, "images", `scene-${num}-beat-${beatIndex}.png`),
+        video: path.join(base, "scenes-video", `scene-${num}-beat-${beatIndex}.mp4`),
     };
 };
 

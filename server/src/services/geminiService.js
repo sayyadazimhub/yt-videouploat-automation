@@ -19,19 +19,29 @@ const SYSTEM_INSTRUCTION = `You are a narrative design agent for a multi-media s
 
 Story Fidelity Rules (CRITICAL):
 1. PRESERVE THE ORIGINAL PREMISE: The user's prompt is the absolute source of truth. Extract the core premise, characters, locations, and goals, and DO NOT change their meaning.
-2. NO AUTOMATIC MORALIZATION: NEVER add moral lessons, motivational speeches, "believe in yourself", "make a better tomorrow", or generic life lessons unless the user explicitly asks for them. A mystery/sci-fi story should remain a mystery/sci-fi story. The lesson taught in a classroom is a subject, NOT a story's moral theme.
-3. AVOID OVER-INVENTING: Do not invent major story tropes like time travel, chosen ones, secret missions, magic, or prophecies unless they are in the user prompt. A hidden staircase is just a hidden staircase.
-4. TIMELINE CONSISTENCY: NEVER hardcode specific years (e.g. 2080 vs 2100) unless requested. Use "the present" or "the future". If a year is used, it MUST remain completely consistent across all scenes.
-5. NO REPETITIVE SCENES: Two consecutive scenes should not show the same action unless it meaningfully progresses. Keep scenes paced properly (e.g. Discovery -> Investigation -> Transition -> Arrival -> Core Action -> Mystery/Cliffhanger).
-6. ENDING: Conclude the story organically and satisfyingly based on its genre. Do NOT force a motivational wrap-up. Let the narrative reach a natural resolution.
+2. NO AUTOMATIC MORALIZATION: NEVER add moral lessons, motivational speeches, "believe in yourself", or generic life lessons unless explicitly asked.
+3. COMPLETE STORY ARC: Even if the user prompt is short or open-ended, you MUST invent a logical sequence of events to form a complete narrative arc (Beginning, Middle, and a definitive End). Do NOT end on unresolved cliffhangers unless explicitly requested by the user.
+4. TIMELINE CONSISTENCY: NEVER hardcode specific years (e.g. 2080 vs 2100) unless requested. Use "the present" or "the future".
+5. SCENE PACING: Keep scenes paced properly (e.g. Discovery -> Investigation -> Confrontation -> Resolution). Ensure the conflict is actually resolved by the final scene.
+6. ENDING: Conclude the story organically with a satisfying resolution based on its genre. Let the narrative reach a natural, finished state without forcing a motivational wrap-up.
 
 Visual/animation direction:
 - CHARACTER CONSISTENCY IS MANDATORY. Define a "characterBible" and "locationBible" at the root level.
 - In every single visualPrompt, explicitly re-describe the exact physical appearance of the main characters based on the characterBible.
+- **CRITICAL FOR VISUALS:** Do NOT just generate static character portraits. The visualPrompt MUST heavily emphasize the ENVIRONMENT and the ACTION happening in the scene (e.g., "Astronaut running through a breaking path of glowing stars, massive shadowy creature emerging from nebulous clouds in the background"). Frame the shots dynamically to capture the story's events.
 - Specify exact cinematic camera movements (e.g., "wide establishing shot", "slow tracking movement") instead of generic zooms.
 
 Your task is to generate this complete cinematic story in valid JSON format ONLY.
-Do NOT include any markdown, code fences, explanations, or extra text — return ONLY the raw JSON object.`;
+Do NOT include any markdown, code fences, explanations, or extra text — return ONLY the raw JSON object.
+
+Voice & Emotion System Rules (CRITICAL):
+- Character voices and the female narrator must have an emotional arc.
+- Narration and Dialogue must be an ARRAY OF SEGMENTS.
+- Each segment must include "text", "emotion" (primary, secondary, intensity), and "delivery" (pace, pitch, volume, vocalCues).
+- The narrator must have context-aware dramatic timing.
+- Character voices must remain consistent based on their personality but shift delivery based on the scene context.
+- Use vocal cues like "nervous_breath", "sigh", "short_pause", "dramatic_pause" inside the delivery object where appropriate, but DO NOT over-use them.
+- Each item in visualBeats will generate a UNIQUE image for the scene. Provide 2 to 4 distinct camera shots or angles per scene (e.g., "Close up on astronaut's face", "Wide establishing shot of the entire cave").`;
 
 const buildUserPrompt = (prompt, style, mood, language, duration, validationFeedback = null) => {
     const moodList = Array.isArray(mood) ? mood.join(", ") : mood;
@@ -79,14 +89,43 @@ Return ONLY this exact JSON structure (no markdown):
       "previousSceneState": "What happened right before this (or 'None' for scene 1)",
       "nextSceneHint": "What should happen next",
       "continuityNotes": "What must remain consistent. Do NOT hardcode years unless necessary.",
-      "narration": "The spoken voiceover script in ${language}. Generate an amount of text that fits the scene duration.",
-      "captions": ["Short, rhythmic overlays in ${language}", "MUST relate exactly to the mystery/plot, no generic motivational quotes"],
-      "dialogue": [
-        { "character": "Character Name", "text": "Dialogue line here" }
+      "narration": [
+        {
+          "text": "The spoken voiceover script in ${language}.",
+          "emotion": {
+            "primary": "fear",
+            "secondary": "curiosity",
+            "intensity": 0.72
+          },
+          "delivery": {
+            "pace": "slow",
+            "pitch": "low",
+            "volume": "soft",
+            "vocalCues": ["dramatic_pause"]
+          }
+        }
       ],
-      "visualPrompt": "Specific, actionable notes. Must embed the exact character descriptions from the characterBible here. Must strictly match the style: Storytelling.",
-      "visualBeats": ["Action 1", "Action 2", "Action 3"],
-      "cameraMovement": "Cinematic direction (e.g., 'wide establishing shot -> slow tracking movement', 'close-up')",
+      "captions": ["Short, rhythmic overlays in ${language}"],
+      "dialogue": [
+        { 
+          "character": "Character Name", 
+          "text": "Dialogue line here",
+          "emotion": {
+            "primary": "surprise",
+            "secondary": "relief",
+            "intensity": 0.85
+          },
+          "delivery": {
+            "pace": "fast",
+            "pitch": "high",
+            "volume": "loud",
+            "vocalCues": ["gasp", "short_pause"]
+          }
+        }
+      ],
+      "visualPrompt": "Specific, actionable notes describing the OVERALL scene environment and characters. Must embed the exact character descriptions from the characterBible here.",
+      "visualBeats": ["Distinct shot 1 (e.g. Close up of face)", "Distinct shot 2 (e.g. Wide angle of environment)", "Distinct shot 3"],
+      "cameraMovement": "Cinematic direction for the scene",
       "mood": "${moodList}",
       "soundEffects": ["Rain pattering", "Distant thunder"],
       "musicMood": "${moodList}"
@@ -136,13 +175,14 @@ const validateStoryJson = (data) => {
 
     data.scenes.forEach((scene, i) => {
         if (typeof scene.sceneNumber === "undefined") throw new Error(`Scene ${i + 1}: missing sceneNumber`);
-        if (!scene.narration && !scene.dialogue) throw new Error(`Scene ${i + 1}: missing narration and dialogue`);
+        if ((!scene.narration || scene.narration.length === 0) && (!scene.dialogue || scene.dialogue.length === 0)) throw new Error(`Scene ${i + 1}: missing narration and dialogue`);
         if (!scene.visualPrompt) throw new Error(`Scene ${i + 1}: missing visualPrompt`);
         if (!scene.duration) scene.duration = 15; // default fallback
         
         // Ensure arrays exist to prevent pipeline crashes
         if (!scene.captions) scene.captions = [];
         if (!scene.dialogue) scene.dialogue = [];
+        if (!scene.narration) scene.narration = [];
         if (!scene.soundEffects) scene.soundEffects = [];
         if (!scene.visualBeats) scene.visualBeats = [];
     });
@@ -194,7 +234,8 @@ Do not include markdown or code fences.`;
 export const generateStory = async (prompt, style, mood, language, duration) => {
     const modelNames = [
         "gemini-3.6-flash",
-        "gemini-flash-latest"
+        "gemini-1.5-flash",
+        "gemini-1.5-pro"
     ];
 
     let client;
