@@ -301,9 +301,9 @@ export default function YouTubeSection({ projectId, initialYouTubeStatus }) {
                   onChange={e => setFormData({...formData, privacyStatus: e.target.value})}
                   className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white focus:border-[#D4AF37]/50 focus:outline-none text-sm"
                 >
+                  <option value="public">Public (Everyone)</option>
                   <option value="private">Private (Only you)</option>
                   <option value="unlisted">Unlisted (Anyone with link)</option>
-                  <option value="public">Public (Everyone)</option>
                 </select>
               </div>
             </div>
