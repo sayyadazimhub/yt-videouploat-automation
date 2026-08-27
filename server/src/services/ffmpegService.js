@@ -226,18 +226,28 @@ export const addMusic = async (videoPath, musicPath, outputPath) => {
         return outputPath;
     }
 
+    // Get the duration of the video to calculate the fade out
+    const originalDuration = await getMediaDuration(videoPath);
+    const padDuration = 2; // Add 2 seconds of lingering video/music at the end
+    const fadeStart = originalDuration; // Start fading out when the original video ends
+
     const command = ffmpeg().input(videoPath);
 
-    const outputOptions = ["-c:v libx264", "-preset fast", "-crf 21", "-pix_fmt yuv420p", "-y", "-map 0:v"];
+    const outputOptions = ["-c:v libx264", "-preset fast", "-crf 21", "-pix_fmt yuv420p", "-y", "-map [v_out]", "-map [audio_out]", "-c:a aac", "-b:a 192k"];
     const complexFilterParts = [];
 
-    // Audio stream handling (mix music + narration, or copy narration)
+    // Audio and Video stream handling
     command.input(musicPath);
     complexFilterParts.push(
+        // Pad the video stream with the last frame for 2 extra seconds
+        `[0:v]tpad=stop_mode=clone:stop_duration=${padDuration}[v_out]`,
+        // Pad the original audio with 2 seconds of silence
+        `[0:a]apad,atrim=0:${fadeStart + padDuration}[a_padded]`,
+        // Loop and adjust background music volume
         `[1:a]volume=${MUSIC_VOLUME},aloop=loop=-1:size=2e+09[music]`,
-        `[0:a][music]amix=inputs=2:duration=first:dropout_transition=2[audio_out]`
+        // Mix the padded audio with the music, and fade out the master mix over the padded duration
+        `[a_padded][music]amix=inputs=2:duration=first:dropout_transition=2,afade=t=out:st=${fadeStart}:d=${padDuration}[audio_out]`
     );
-    outputOptions.push("-map [audio_out]", "-c:a aac", "-b:a 192k");
 
     command.complexFilter(complexFilterParts);
     command.outputOptions(outputOptions).output(outputPath);

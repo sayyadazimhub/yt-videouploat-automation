@@ -123,10 +123,12 @@ const generateSingleAudio = async (segment, outputPath, voiceName) => {
         console.log(`🎙️  TTS (Edge Neural): "${text.substring(0, 40)}..." (${voiceName})`);
 
         let handled = false;
+        let writeStream = null;
         const timer = setTimeout(() => {
             if (!handled) {
                 handled = true;
                 console.warn("⚠️  TTS (Edge) timed out after 30s. Falling back to silent audio.");
+                if (writeStream && !writeStream.destroyed) writeStream.destroy();
                 createSilentAudio(outputPath).then(resolve).catch(reject);
             }
         }, 30000);
@@ -155,7 +157,7 @@ const generateSingleAudio = async (segment, outputPath, voiceName) => {
             const dir = path.dirname(outputPath);
             if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
             
-            const writeStream = fs.createWriteStream(outputPath);
+            writeStream = fs.createWriteStream(outputPath);
             
             audioStream.pipe(writeStream);
             
@@ -171,6 +173,7 @@ const generateSingleAudio = async (segment, outputPath, voiceName) => {
                 handled = true;
                 clearTimeout(timer);
                 console.error(`❌ TTS Stream Error:`, err);
+                if (writeStream && !writeStream.destroyed) writeStream.destroy();
                 createSilentAudio(outputPath).then(resolve).catch(reject);
             });
 
@@ -179,6 +182,7 @@ const generateSingleAudio = async (segment, outputPath, voiceName) => {
             if (handled) return;
             handled = true;
             clearTimeout(timer);
+            if (writeStream && !writeStream.destroyed) writeStream.destroy();
             console.warn("⚠️  Falling back to silent audio");
             createSilentAudio(outputPath).then(resolve).catch(reject);
         }

@@ -20,7 +20,7 @@ export default function YouTubeSection({ projectId, initialYouTubeStatus }) {
     title: "",
     description: "",
     tags: "",
-    privacyStatus: "private"
+    privacyStatus: "public"
   });
   const [uploadState, setUploadState] = useState(null); 
   const [isGeneratingMeta, setIsGeneratingMeta] = useState(false);

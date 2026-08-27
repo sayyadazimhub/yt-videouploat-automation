@@ -68,8 +68,8 @@ The story's narration, dialogue, and pacing MUST heavily reflect the requested M
 
 Return ONLY this exact JSON structure (no markdown):
 {
-  "title": "Story Title Here",
-  "description": "A 2-3 sentence story description",
+  "title": "Catchy and highly engaging YouTube Shorts title in Hinglish (Hindi written in English alphabet) that creates extreme curiosity. Must include emojis and relevant viral hashtags (e.g. '24 ghante baad ki tasvir 😱 #viral #story #shorts')",
+  "description": "Engaging YouTube Shorts description in Hinglish with emojis, a hook, a brief summary, a question for the audience, Call-to-Action (Like, Comment, Subscribe), and relevant hashtags",
   "language": "${language}",
   "duration": ${duration},
   "style": "Storytelling",
@@ -134,7 +134,7 @@ Return ONLY this exact JSON structure (no markdown):
 }
 
 IMPORTANT:
-- Regardless of what language the "Story Idea" is written in, "title", "description", "narration", "captions", and "dialogue" MUST BE entirely in ${language}. 
+- Regardless of what language the "Story Idea" is written in, "narration", "captions", and "dialogue" MUST BE entirely in ${language}. The "title" and "description" MUST be in Hinglish and formatted for YouTube Shorts with emojis and hashtags.
 - Visual prompts MUST be strictly in English and MUST contain the detailed character design sheet for consistency.
 - Return ONLY the JSON — nothing else`;
 };
