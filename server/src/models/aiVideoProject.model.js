@@ -109,6 +109,10 @@ const AiVideoProjectSchema = new mongoose.Schema(
             type: Date,
             default: null,
         },
+        auto_upload_youtube: {
+            type: Boolean,
+            default: false,
+        }
     },
     {
         timestamps: true,

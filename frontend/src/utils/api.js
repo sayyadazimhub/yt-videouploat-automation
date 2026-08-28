@@ -14,8 +14,8 @@ export const generateStory = (data) =>
   api.post("/ai-video/story", data);
 
 /** Start full video generation pipeline (Step 2) */
-export const startVideoGeneration = (projectId, storyJson) =>
-  api.post("/ai-video/generate", { projectId, storyJson });
+export const startVideoGeneration = (projectId, storyJson, autoUploadToYouTube = false) =>
+  api.post("/ai-video/generate", { projectId, storyJson, autoUploadToYouTube });
 
 /** Get list of all completed projects */
 export const getProjects = () =>

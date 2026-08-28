@@ -33,12 +33,12 @@ import {
   Layers,
   Zap,
   X,
+  Youtube,
 } from "lucide-react";
 
 // ── Constants ────────────────────────────────────────────────────
 
-const STYLES = ["Cinematic", "Documentary", "Short Film", "Anime", "Storytelling", "Thriller"];
-const MOODS = ["Suspense", "Drama", "Action", "Comedy", "Mystery", "Emotional", "Horror", "Romantic"];
+
 const DURATIONS = [
   { label: "1 min", value: 60 },
   { label: "2 min", value: 120 },
@@ -241,11 +241,10 @@ export default function AiVideoPage() {
   const [stage, setStage] = useState("form"); // form | preview | progress
   const [formData, setFormData] = useState({
     prompt: "",
-    style: "Cinematic",
-    mood: ["Drama"],
     duration: 60,
     language: "Hindi",
     format: "9:16",
+    autoUploadToYouTube: true,
   });
   const [isGeneratingStory, setIsGeneratingStory] = useState(false);
   const [story, setStory] = useState(null);
@@ -261,15 +260,6 @@ export default function AiVideoPage() {
 
   // ── Form handlers ───────────────────────────────────────────
 
-  const toggleMood = (mood) => {
-    setFormData((prev) => ({
-      ...prev,
-      mood: prev.mood.includes(mood)
-        ? prev.mood.filter((m) => m !== mood)
-        : [...prev.mood, mood],
-    }));
-  };
-
   // ── Generate Story ─────────────────────────────────────────
 
   const handleGenerateStory = async () => {
@@ -277,19 +267,23 @@ export default function AiVideoPage() {
       toast.error("Please enter a story idea (at least 10 characters).");
       return;
     }
-    if (formData.mood.length === 0) {
-      toast.error("Please select at least one mood.");
-      return;
-    }
-
     setIsGeneratingStory(true);
     try {
       const res = await generateStory(formData);
       if (res.data.success) {
-        setStory(res.data.data.story);
-        setProjectId(res.data.data.projectId);
-        setStage("preview");
-        toast.success("Story generated successfully!");
+        const generatedStory = res.data.data.story;
+        const newProjectId = res.data.data.projectId;
+        setStory(generatedStory);
+        setProjectId(newProjectId);
+        toast.success("Story generated! Starting video pipeline...");
+        
+        // Auto-start video generation immediately
+        const videoRes = await startVideoGeneration(newProjectId, JSON.stringify(generatedStory), formData.autoUploadToYouTube);
+        if (videoRes.data.success) {
+          setStage("progress");
+          setStatusData({ status: "GENERATING_STORY", progress: 5, progressLabel: "Starting pipeline..." });
+          startPolling(newProjectId);
+        }
       }
     } catch (err) {
       const msg = err.response?.data?.message || "Failed to generate story.";
@@ -315,7 +309,7 @@ export default function AiVideoPage() {
         }
       }
 
-      const res = await startVideoGeneration(projectId, JSON.stringify(storyToUse));
+      const res = await startVideoGeneration(projectId, JSON.stringify(storyToUse), formData.autoUploadToYouTube);
       if (res.data.success) {
         setStage("progress");
         setStatusData({ status: "GENERATING_STORY", progress: 5, progressLabel: "Starting..." });
@@ -339,15 +333,28 @@ export default function AiVideoPage() {
         const res = await getProjectStatus(pid);
         if (res.data.success) {
           const data = res.data.data;
+          
+          const isYoutubeWorking = data.youtubeStatus === "PROCESSING" || data.youtubeStatus === "UPLOADING";
+          
           setStatusData(data);
 
           if (data.status === "COMPLETED") {
-            clearInterval(pollRef.current);
             setVideoUrl(getMediaUrl(data.videoPath));
-            toast.success("🎬 Your cinematic video is ready!");
-          } else if (data.status === "FAILED") {
+            if (isYoutubeWorking || data.youtubeStatus === "COMPLETED") {
+                setStage("youtube");
+            }
+          }
+
+          if (data.status === "COMPLETED" && !isYoutubeWorking) {
             clearInterval(pollRef.current);
-            toast.error(`Generation failed: ${data.errorMessage || "Unknown error"}`);
+            if (data.youtubeStatus === "COMPLETED") {
+              toast.success("🎬 Your video is ready and uploaded to YouTube!");
+            } else {
+              toast.success("🎬 Your cinematic video is ready!");
+            }
+          } else if (data.status === "FAILED" || data.youtubeStatus === "FAILED") {
+            clearInterval(pollRef.current);
+            toast.error(`Failed: ${data.errorMessage || "Unknown error"}`);
           }
         }
       } catch (_) {}
@@ -439,10 +446,24 @@ export default function AiVideoPage() {
 
           {/* Stage indicator */}
           <div className="flex flex-wrap items-center gap-3 mt-10">
-            {["Story Idea", "Review & Edit", "Generation"].map((s, i) => {
-              const stageKeys = ["form", "preview", "progress"];
-              const isActive = stageKeys[i] === stage;
-              const isDone = stageKeys.indexOf(stage) > i;
+            {["Story Idea", "Review & Edit", "Generation", "YouTube Upload"].map((s, i) => {
+              let isActive = false;
+              let isDone = false;
+              
+              if (i === 0) { // Story Idea
+                isActive = stage === "form";
+                isDone = stage !== "form";
+              } else if (i === 1) { // Review & Edit
+                isActive = stage === "preview";
+                isDone = stage === "progress" || stage === "youtube";
+              } else if (i === 2) { // Generation
+                isActive = stage === "progress";
+                isDone = stage === "youtube";
+              } else if (i === 3) { // YouTube Upload
+                isActive = stage === "youtube" && statusData?.youtubeStatus !== "COMPLETED";
+                isDone = stage === "youtube" && statusData?.youtubeStatus === "COMPLETED";
+              }
+
               return (
                 <div key={s} className="flex items-center gap-3">
                   <div className={`flex items-center gap-2.5 px-4 py-2 rounded-full text-xs font-bold transition-all duration-500 ${
@@ -453,7 +474,7 @@ export default function AiVideoPage() {
                     {isDone ? <CheckCircle2 size={14} className="text-emerald-400" /> : <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] ${isActive ? "bg-cyan-500 text-black" : "bg-[#2a2a2a] text-slate-400"}`}>{i + 1}</span>}
                     {s}
                   </div>
-                  {i < 2 && <ChevronRight size={16} className="text-[#333]" />}
+                  {i < 3 && <ChevronRight size={16} className="text-[#333]" />}
                 </div>
               );
             })}
@@ -515,26 +536,6 @@ export default function AiVideoPage() {
                   </div>
                 </div>
 
-                {/* Mood */}
-                <div className="glass-card p-5 hover:border-[#06b6d4]/30 transition-colors duration-500">
-                  <SectionLabel>Mood</SectionLabel>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {MOODS.map((m) => (
-                      <button
-                        key={m}
-                        id={`mood-${m.toLowerCase()}`}
-                        onClick={() => toggleMood(m)}
-                        className={`px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all duration-300 ${
-                          formData.mood.includes(m)
-                            ? "bg-[#06b6d4]/10 border-[#06b6d4] text-[#06b6d4] shadow-[0_0_15px_rgba(6,182,212,0.15)] scale-[1.05]"
-                            : "bg-[#111] border-[#333] text-slate-400 hover:border-[#555] hover:text-slate-200 hover:bg-[#1a1a1a]"
-                        }`}
-                      >
-                        {m}
-                      </button>
-                    ))}
-                  </div>
-                </div>
 
                 {/* Duration */}
                 <div className="glass-card p-5 hover:border-[#06b6d4]/30 transition-colors duration-500">
@@ -581,6 +582,27 @@ export default function AiVideoPage() {
                         </p>
                       </button>
                     ))}
+                  </div>
+                </div>
+                {/* Auto Upload Toggle */}
+                <div className="glass-card p-5 hover:border-[#06b6d4]/30 transition-colors duration-500">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <SectionLabel>Auto-Upload to YouTube</SectionLabel>
+                      <p className="text-xs text-slate-400 -mt-2">Requires connected account.</p>
+                    </div>
+                    <button
+                      onClick={() => setFormData({ ...formData, autoUploadToYouTube: !formData.autoUploadToYouTube })}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 flex-shrink-0 ${
+                        formData.autoUploadToYouTube ? 'bg-[#06b6d4]' : 'bg-[#333]'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
+                          formData.autoUploadToYouTube ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
                   </div>
                 </div>
 
@@ -798,33 +820,35 @@ export default function AiVideoPage() {
                   <div className="glass-card p-5 space-y-4">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 size={16} className="text-emerald-400" />
-                      <h4 className="text-white font-bold">Your Video is Ready!</h4>
+                      <h4 className="text-white font-bold">
+                        {statusData?.youtubeStatus === "COMPLETED" ? "Video Uploaded Successfully!" : "Your Video is Ready!"}
+                      </h4>
                     </div>
+
+                    {(statusData?.youtubeStatus === "PROCESSING" || statusData?.youtubeStatus === "UPLOADING") && (
+                      <div className="p-3 bg-[#06b6d4]/10 border border-[#06b6d4]/30 rounded-lg text-sm text-[#06b6d4] flex items-center justify-between transition-colors">
+                        <span className="font-medium flex items-center gap-2">
+                          <Loader2 size={16} className="animate-spin" /> Auto-uploading to YouTube...
+                        </span>
+                      </div>
+                    )}
+
+                    {statusData?.youtubeStatus === "COMPLETED" && statusData?.youtubeUrl && (
+                      <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-sm text-red-400 flex items-center justify-between transition-colors hover:bg-red-500/20">
+                        <span className="font-medium text-red-300">Available on YouTube</span>
+                        <a href={statusData.youtubeUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 font-bold hover:underline">
+                           Watch Now
+                        </a>
+                      </div>
+                    )}
+
                     <video
                       ref={videoRef}
                       src={videoUrl}
                       controls
                       className="w-full rounded-xl max-h-[400px] bg-black"
                     />
-                    <div className="flex gap-3">
-                      <PrimaryButton onClick={handleDownload} className="flex-1">
-                        <Download size={15} />
-                        Download MP4
-                      </PrimaryButton>
-                      <OutlineButton onClick={handleDeleteProject} className="px-4">
-                        <Trash2 size={15} />
-                      </OutlineButton>
-                    </div>
-                    <OutlineButton onClick={handleRegenerate} className="w-full">
-                      <RefreshCw size={14} />
-                      Create Another Video
-                    </OutlineButton>
                   </div>
-                )}
-
-                {/* YouTube Upload Integration */}
-                {videoUrl && statusData?.status === "COMPLETED" && (
-                    <YouTubeSection projectId={projectId} />
                 )}
 
                 {/* Waiting state */}
@@ -855,6 +879,66 @@ export default function AiVideoPage() {
                   Pipeline: Image generation → Voice narration → FFmpeg scene rendering → Music mix → Final video.
                 </p>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ═══════════════════════════════════════════════
+            STAGE 4 — YOUTUBE UPLOAD
+        ════════════════════════════════════════════════ */}
+        {stage === "youtube" && (
+          <div className="fade-up max-w-2xl mx-auto mt-3">
+            <div className="glass-card p-6 flex flex-col sm:flex-row items-center gap-8">
+              
+              {/* Video Preview - Compact 9:16 constraint */}
+              {videoUrl && (
+                <div className="w-[160px] flex-shrink-0">
+                  <video
+                    src={videoUrl}
+                    controls
+                    className="w-full aspect-[9/16] rounded-xl bg-black border border-[#2a2a2a] shadow-lg object-cover"
+                  />
+                </div>
+              )}
+
+              {/* Status and Actions */}
+              <div className="flex-1 flex flex-col items-center sm:items-start text-center sm:text-left">
+                <div className="flex items-center gap-3 mb-3">
+                  {statusData?.youtubeStatus === "COMPLETED" ? (
+                    <CheckCircle2 size={24} className="text-emerald-400" />
+                  ) : (
+                    <Loader2 size={24} className="text-red-500 animate-spin" />
+                  )}
+                  <h2 className="text-xl font-bold text-white">
+                    {statusData?.youtubeStatus === "COMPLETED" ? "Published on YouTube!" : "Uploading to YouTube..."}
+                  </h2>
+                </div>
+
+                <p className="text-sm text-slate-400 mb-8">
+                  {statusData?.youtubeStatus === "COMPLETED" 
+                    ? "Your AI video is now live on your channel. You can check it out below or start a new project." 
+                    : "Please wait while we securely transfer your generated video to your YouTube channel."}
+                </p>
+
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 w-full">
+                  {statusData?.youtubeStatus === "COMPLETED" && statusData?.youtubeUrl && (
+                    <a 
+                      href={statusData.youtubeUrl} 
+                      target="_blank" 
+                      rel="noreferrer" 
+                      className="flex items-center justify-center gap-2 px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold rounded-lg transition-all shadow-[0_0_15px_rgba(220,38,38,0.3)] hover:scale-105"
+                    >
+                      <Youtube size={18} />
+                      Watch on YouTube
+                    </a>
+                  )}
+                  
+                  <OutlineButton onClick={handleRegenerate} className="px-5 py-2.5 text-sm flex-1 sm:flex-none">
+                    <RefreshCw size={14} /> Create Another
+                  </OutlineButton>
+                </div>
+              </div>
+
             </div>
           </div>
         )}

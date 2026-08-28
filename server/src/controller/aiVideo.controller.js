@@ -80,7 +80,7 @@ export const generateStoryController = async (req, res) => {
 // ─────────────────────────────────────────────
 export const startGenerationController = async (req, res) => {
     try {
-        const { projectId, storyJson } = req.body;
+        const { projectId, storyJson, autoUploadToYouTube } = req.body;
 
         if (!projectId) {
             return res.status(400).json({ success: false, message: "projectId is required." });
@@ -116,6 +116,7 @@ export const startGenerationController = async (req, res) => {
                 error_message: null,
                 video_path: null,
                 story_json: JSON.stringify(storyData),
+                auto_upload_youtube: autoUploadToYouTube === true
             }
         );
 
@@ -228,7 +229,7 @@ export const getProjectController = async (req, res) => {
 export const getStatusController = async (req, res) => {
     try {
         const { projectId } = req.params;
-        const project = await AiVideoProject.findById(projectId).select("id status progress progress_label video_path error_message updatedAt");
+        const project = await AiVideoProject.findById(projectId).select("id status progress progress_label video_path error_message youtube_status youtube_url updatedAt");
 
         if (!project) {
             return res.status(404).json({ success: false, message: "Project not found." });
@@ -243,6 +244,8 @@ export const getStatusController = async (req, res) => {
                 progressLabel: project.progress_label,
                 videoPath: project.video_path,
                 errorMessage: project.error_message,
+                youtubeStatus: project.youtube_status,
+                youtubeUrl: project.youtube_url,
                 updatedAt: project.updatedAt,
             },
         });

@@ -1,6 +1,5 @@
 import { google } from "googleapis";
 import fs from "fs";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -60,7 +59,7 @@ export const uploadVideo = async (refreshToken, videoPath, metadata) => {
     const fileSize = fs.statSync(videoPath).size;
     
     const res = await youtube.videos.insert({
-        part: ["snippet", "status"],
+        part: ["snippet", "status", "recordingDetails"],
         requestBody: {
             snippet: {
                 title: metadata.title,
@@ -68,7 +67,14 @@ export const uploadVideo = async (refreshToken, videoPath, metadata) => {
                 tags: metadata.tags,
             },
             status: {
-                privacyStatus: metadata.privacyStatus || "private",
+                privacyStatus: metadata.privacyStatus || "public",
+            },
+            recordingDetails: {
+                locationDescription: "Maharashtra, India",
+                location: {
+                    latitude: 19.7515,
+                    longitude: 75.7139
+                }
             }
         },
         media: {
@@ -95,38 +101,3 @@ export const getVideoStatus = async (refreshToken, videoId) => {
     return null;
 };
 
-export const generateMetadata = async (prompt) => {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error("GEMINI_API_KEY is not set.");
-    
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // using latest 1.5 flash
-    
-    const sysPrompt = `Generate a compelling YouTube title, description, and up to 10 tags for a video based on this prompt: "${prompt}".
-    Return ONLY valid JSON format like this:
-    {
-      "title": "...",
-      "description": "...",
-      "tags": ["...", "..."]
-    }
-    Do not output markdown code blocks. Just raw JSON.`;
-    
-    const result = await model.generateContent(sysPrompt);
-    const text = result.response.text();
-    
-    try {
-        let cleanText = text.trim();
-        if (cleanText.startsWith('```')) {
-            cleanText = cleanText.replace(/```(json)?/g, '').trim();
-        }
-        const startIndex = cleanText.indexOf('{');
-        const endIndex = cleanText.lastIndexOf('}');
-        if (startIndex !== -1 && endIndex !== -1) {
-            cleanText = cleanText.substring(startIndex, endIndex + 1);
-        }
-        return JSON.parse(cleanText);
-    } catch (err) {
-        console.error("Failed to parse Gemini output:", text);
-        throw new Error("Failed to parse Gemini output as JSON.");
-    }
-};

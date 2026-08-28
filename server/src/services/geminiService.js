@@ -51,13 +51,13 @@ const buildUserPrompt = (prompt, style, mood, language, duration, validationFeed
 
 Story Idea: ${prompt}
 Style: Storytelling
-Mood(s): ${moodList}
+Mood(s): DYNAMIC (Deduce the most appropriate primary and secondary moods based on the Story Idea)
 Language: ${language}
 Target Duration: ~${duration} seconds (This is an APPROXIMATE target. The story length is DYNAMIC. Prioritize concluding the story organically over strictly hitting this limit).
 Number of Scenes: DYNAMIC (Determine the number of scenes based on story complexity. Each scene should represent a meaningful story beat).${feedbackText}
 
 NARRATIVE TONE GUIDELINES (CRITICAL):
-The story's narration, dialogue, and pacing MUST heavily reflect the requested Mood(s) (${moodList}). 
+The story's narration, dialogue, and pacing MUST heavily reflect the moods you have automatically deduced from the Story Idea. 
 - If Comedy: Use a lighthearted tone, humorous situations, witty dialogue, and comedic timing.
 - If Horror/Suspense: Use dread-inducing vocabulary, tense pacing, focus on shadows/isolation, and create visceral fear.
 - If Drama/Emotional: Focus on deep character feelings, relational conflict, poignant dialogue, and moving narration.
@@ -73,7 +73,7 @@ Return ONLY this exact JSON structure (no markdown):
   "language": "${language}",
   "duration": ${duration},
   "style": "Storytelling",
-  "mood": "${moodList}",
+  "mood": "Write the deduced mood here (e.g. 'Suspense', 'Emotional', 'Comedy')",
   "characterBible": { "CharacterName": "Detailed physical description (age, hair, eyes, clothing, ethnicity)" },
   "characterGenders": { "CharacterName": "male or female (strictly one of these two)" },
   "locationBible": { "LocationName": "Detailed physical description of the space" },

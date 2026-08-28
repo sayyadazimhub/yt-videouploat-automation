@@ -93,12 +93,7 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
-/* ── Mood chip selected state ── */
-.mood-chip-selected {
-  background: rgba(212, 175, 55, 0.2);
-  border-color: #D4AF37;
-  color: #D4AF37;
-}
+
 
 /* ── Video player ── */
 video {

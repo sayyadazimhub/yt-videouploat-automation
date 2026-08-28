@@ -189,15 +189,15 @@ export default function YouTubeSection({ projectId, initialYouTubeStatus }) {
 
   if (status === "loading") {
     return (
-      <div className="glass-card p-6 flex items-center justify-center min-h-[200px]">
-        <Loader2 className="animate-spin text-[#D4AF37]" size={24} />
+      <div className="rounded-xl border border-[#2a2a2a] bg-[#141414]/80 backdrop-blur-md p-6 flex items-center justify-center min-h-[200px]">
+        <Loader2 className="animate-spin text-[#06b6d4]" size={24} />
       </div>
     );
   }
 
   return (
-    <div className="glass-card overflow-hidden mt-6">
-      <div className="p-4 border-b border-[#2a2a2a] bg-[#141414] flex items-center justify-between">
+    <div className="rounded-xl border border-[#2a2a2a] bg-[#141414]/80 backdrop-blur-md overflow-hidden mt-6 transition-all duration-300 hover:border-[#06b6d4]/30 hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+      <div className="p-4 border-b border-[#2a2a2a]/50 bg-[#1a1a1a]/90 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Youtube className="text-red-500" size={20} />
           <h3 className="text-white font-bold">YouTube Integration</h3>
@@ -230,7 +230,7 @@ export default function YouTubeSection({ projectId, initialYouTubeStatus }) {
             </p>
             <button 
               onClick={handleConnect}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-all"
+              className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:scale-[1.02] active:scale-[0.98]"
             >
               <Youtube size={18} />
               Connect YouTube
@@ -255,7 +255,7 @@ export default function YouTubeSection({ projectId, initialYouTubeStatus }) {
               <button 
                 onClick={handleGenerateMetadata}
                 disabled={isGeneratingMeta}
-                className="flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-lg bg-[#D4AF37]/10 text-[#D4AF37] hover:bg-[#D4AF37]/20 transition-all disabled:opacity-50"
+                className="flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-lg bg-[#06b6d4]/10 text-[#06b6d4] border border-[#06b6d4]/20 hover:bg-[#06b6d4]/20 hover:shadow-[0_0_10px_rgba(6,182,212,0.2)] transition-all disabled:opacity-50"
               >
                 {isGeneratingMeta ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
                 Generate with AI
@@ -271,7 +271,7 @@ export default function YouTubeSection({ projectId, initialYouTubeStatus }) {
                   onChange={e => setFormData({...formData, title: e.target.value})}
                   maxLength={100}
                   placeholder="Cinematic Masterpiece..."
-                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white focus:border-[#D4AF37]/50 focus:outline-none text-sm"
+                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white focus:border-[#06b6d4]/50 hover:border-[#06b6d4]/30 focus:outline-none text-sm transition-colors duration-300"
                 />
               </div>
               <div>
@@ -281,7 +281,7 @@ export default function YouTubeSection({ projectId, initialYouTubeStatus }) {
                   onChange={e => setFormData({...formData, description: e.target.value})}
                   rows={4}
                   placeholder="In this short film, we explore..."
-                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white focus:border-[#D4AF37]/50 focus:outline-none text-sm resize-none"
+                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white focus:border-[#06b6d4]/50 hover:border-[#06b6d4]/30 focus:outline-none text-sm resize-none transition-colors duration-300"
                 />
               </div>
               <div>
@@ -291,7 +291,7 @@ export default function YouTubeSection({ projectId, initialYouTubeStatus }) {
                   value={formData.tags}
                   onChange={e => setFormData({...formData, tags: e.target.value})}
                   placeholder="cinematic, short, ai video"
-                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white focus:border-[#D4AF37]/50 focus:outline-none text-sm"
+                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white focus:border-[#06b6d4]/50 hover:border-[#06b6d4]/30 focus:outline-none text-sm transition-colors duration-300"
                 />
               </div>
               <div>
@@ -299,7 +299,7 @@ export default function YouTubeSection({ projectId, initialYouTubeStatus }) {
                 <select
                   value={formData.privacyStatus}
                   onChange={e => setFormData({...formData, privacyStatus: e.target.value})}
-                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white focus:border-[#D4AF37]/50 focus:outline-none text-sm"
+                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white focus:border-[#06b6d4]/50 hover:border-[#06b6d4]/30 focus:outline-none text-sm transition-colors duration-300"
                 >
                   <option value="public">Public (Everyone)</option>
                   <option value="private">Private (Only you)</option>
@@ -311,7 +311,7 @@ export default function YouTubeSection({ projectId, initialYouTubeStatus }) {
             <button 
               onClick={handleUpload}
               disabled={isUploading || !formData.title}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-[#D4AF37] text-black font-bold rounded-xl transition-all hover:bg-[#e8c84e] disabled:opacity-50 mt-4"
+              className="w-full flex items-center justify-center gap-2.5 px-6 py-3.5 bg-gradient-to-r from-[#06b6d4] to-[#3b82f6] text-white font-extrabold rounded-xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none mt-4"
             >
               {isUploading ? <Loader2 size={18} className="animate-spin" /> : <UploadCloud size={18} />}
               Upload to YouTube
@@ -321,7 +321,7 @@ export default function YouTubeSection({ projectId, initialYouTubeStatus }) {
 
         {(status === "uploading" || status === "processing") && (
           <div className="text-center py-8">
-            <Loader2 size={40} className="text-[#D4AF37] animate-spin mx-auto mb-4" />
+            <Loader2 size={40} className="text-[#06b6d4] animate-spin mx-auto mb-4 drop-shadow-[0_0_10px_rgba(6,182,212,0.3)]" />
             <h4 className="text-lg font-bold text-white mb-2">
               {status === "uploading" ? "Uploading to YouTube..." : "Processing on YouTube..."}
             </h4>
@@ -345,7 +345,7 @@ export default function YouTubeSection({ projectId, initialYouTubeStatus }) {
               href={uploadState.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-all"
+              className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:scale-[1.02] active:scale-[0.98]"
             >
               <Youtube size={18} />
               Watch on YouTube
