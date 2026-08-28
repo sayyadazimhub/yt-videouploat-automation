@@ -14,14 +14,6 @@ const AiVideoProjectSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        style: {
-            type: String,
-            default: "Cinematic",
-        },
-        mood: {
-            type: String,
-            default: null,
-        },
         language: {
             type: String,
             required: true,

@@ -9,7 +9,7 @@ import { generateProjectId, deleteProjectFiles, getFinalVideoUrl, fileExists, ge
 // ─────────────────────────────────────────────
 export const generateStoryController = async (req, res) => {
     try {
-        const { prompt, style, mood, language, duration } = req.body;
+        const { prompt, language, duration } = req.body;
 
         // Input validation
         if (!prompt || prompt.trim().length < 10) {
@@ -22,18 +22,14 @@ export const generateStoryController = async (req, res) => {
         const validLanguages = ["English", "Hindi", "Marathi"];
         const validDurations = [30, 60, 120, 180];
 
-        const storyStyle = "Storytelling";
         const storyLanguage = validLanguages.includes(language) ? language : "English";
         const storyDuration = validDurations.includes(Number(duration)) ? Number(duration) : 60;
-        const storyMood = Array.isArray(mood) ? mood : [mood || "Drama"];
 
         console.log(`\n🎬 Story generation request: "${prompt.substring(0, 50)}..."`);
 
         // Generate story via Gemini
         const storyData = await generateStory(
             prompt.trim(),
-            storyStyle,
-            storyMood,
             storyLanguage,
             storyDuration
         );
@@ -44,8 +40,6 @@ export const generateStoryController = async (req, res) => {
             _id: projectId,
             user_id: req.user?.id || null,
             prompt: prompt.trim(),
-            style: storyStyle,
-            mood: storyMood.join(","),
             language: storyLanguage,
             duration: storyDuration,
             format: req.body.format || "9:16",

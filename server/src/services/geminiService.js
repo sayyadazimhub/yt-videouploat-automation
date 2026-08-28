@@ -43,8 +43,7 @@ Voice & Emotion System Rules (CRITICAL):
 - Use vocal cues like "nervous_breath", "sigh", "short_pause", "dramatic_pause" inside the delivery object where appropriate, but DO NOT over-use them.
 - Each item in visualBeats will generate a UNIQUE image for the scene. Provide 2 to 4 distinct camera shots or angles per scene (e.g., "Close up on astronaut's face", "Wide establishing shot of the entire cave").`;
 
-const buildUserPrompt = (prompt, style, mood, language, duration, validationFeedback = null) => {
-    const moodList = Array.isArray(mood) ? mood.join(", ") : mood;
+const buildUserPrompt = (prompt, language, duration, validationFeedback = null) => {
     const feedbackText = validationFeedback ? `\n\nPREVIOUS ATTEMPT FAILED VALIDATION:\n${validationFeedback}\n\nPlease revise the story to fix these issues while maintaining the original premise.` : "";
     
     return `Create a cinematic story with the following specifications:
@@ -126,9 +125,9 @@ Return ONLY this exact JSON structure (no markdown):
       "visualPrompt": "Specific, actionable notes describing the OVERALL scene environment and characters. Must embed the exact character descriptions from the characterBible here.",
       "visualBeats": ["Distinct shot 1 (e.g. Close up of face)", "Distinct shot 2 (e.g. Wide angle of environment)", "Distinct shot 3"],
       "cameraMovement": "Cinematic direction for the scene",
-      "mood": "${moodList}",
+      "mood": "Write the deduced scene mood here",
       "soundEffects": ["Rain pattering", "Distant thunder"],
-      "musicMood": "${moodList}"
+      "musicMood": "Write the deduced music mood here"
     }
   ]
 }
@@ -231,7 +230,7 @@ Do not include markdown or code fences.`;
  * Generate a structured story JSON from user input using Gemini
  * @returns {Object} Validated story JSON
  */
-export const generateStory = async (prompt, style, mood, language, duration) => {
+export const generateStory = async (prompt, language, duration) => {
     const modelNames = [
         "gemini-3.6-flash",
         "gemini-1.5-flash",
@@ -263,7 +262,7 @@ export const generateStory = async (prompt, style, mood, language, duration) => 
 
             while (attempts < MAX_STORY_ATTEMPTS && !finalParsed) {
                 attempts++;
-                const userPrompt = buildUserPrompt(prompt, style, mood, language, duration, validationFeedback);
+                const userPrompt = buildUserPrompt(prompt, language, duration, validationFeedback);
                 const result = await model.generateContent(userPrompt);
                 const text = result.response.text();
 
