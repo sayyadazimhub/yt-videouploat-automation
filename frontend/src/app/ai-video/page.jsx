@@ -9,30 +9,19 @@ import {
   getMediaUrl,
   deleteProject,
 } from "../../utils/api";
-import YouTubeSection from "../../components/youtube/YouTubeSection";
 import {
-  Film,
   Sparkles,
   ChevronRight,
   RefreshCw,
-  Play,
-  Download,
-  Edit3,
   CheckCircle2,
   Loader2,
-  Circle,
   Clock,
-  Eye,
-  Trash2,
   AlertCircle,
-  Clapperboard,
-  Music,
   Mic,
   ImageIcon,
   Video,
   Layers,
   Zap,
-  X,
   Youtube,
 } from "lucide-react";
 
@@ -106,95 +95,7 @@ function OutlineButton({ onClick, disabled, children, className = "" }) {
   );
 }
 
-function SceneCard({ scene, index }) {
-  const [expanded, setExpanded] = useState(false);
-  
-  const getNarrationText = (narration) => {
-    if (!narration) return "";
-    if (typeof narration === "string") return narration;
-    if (Array.isArray(narration)) {
-      return narration.map(n => typeof n === "string" ? n : n.text || "").join(" ");
-    }
-    return String(narration);
-  };
 
-  const narrationText = getNarrationText(scene.narration);
-
-  return (
-    <div className="rounded-xl border border-[#2a2a2a] bg-[#141414]/80 backdrop-blur-md overflow-hidden transition-all duration-300 hover:border-[#06b6d4]/30 hover:shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[#1a1a1a]/90 transition-colors"
-      >
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#06b6d4]/20 to-transparent border border-[#06b6d4]/30 flex items-center justify-center text-[#06b6d4] text-sm font-black flex-shrink-0 shadow-[0_0_10px_rgba(6,182,212,0.1)]">
-            {scene.sceneNumber || index + 1}
-          </div>
-          <div>
-            <p className="text-white font-bold text-sm line-clamp-1 tracking-wide">
-              {narrationText.substring(0, 60) || "Scene narration"}...
-            </p>
-            <div className="flex items-center gap-3 mt-1.5">
-              <span className="text-xs text-slate-400 flex items-center gap-1 bg-[#0a0a0a] px-2 py-0.5 rounded-md border border-[#333]">
-                <Clock size={10} /> {scene.duration}s
-              </span>
-              <span className="text-xs text-[#06b6d4] font-semibold bg-[#06b6d4]/10 px-2 py-0.5 rounded-md border border-[#06b6d4]/20">{scene.mood}</span>
-              <span className="text-xs text-slate-400 bg-[#0a0a0a] px-2 py-0.5 rounded-md border border-[#333]">{scene.cameraMovement}</span>
-            </div>
-          </div>
-        </div>
-        <div className={`w-8 h-8 flex items-center justify-center rounded-full bg-[#0a0a0a] border border-[#333] transition-all duration-300 ${expanded ? "rotate-90 bg-[#06b6d4]/10 border-[#06b6d4]/30" : ""}`}>
-          <ChevronRight
-            size={16}
-            className={expanded ? "text-[#06b6d4]" : "text-slate-500"}
-          />
-        </div>
-      </button>
-
-      {expanded && (
-        <div className="px-5 pb-5 space-y-5 border-t border-[#2a2a2a]/50 pt-5 bg-[#0a0a0a]/30">
-          <div>
-            <p className="text-[10px] font-black text-[#06b6d4] uppercase tracking-widest mb-2 flex items-center gap-1.5"><Mic size={12}/> Narration</p>
-            <p className="text-slate-200 text-sm leading-relaxed border-l-2 border-[#06b6d4]/30 pl-3">{narrationText}</p>
-          </div>
-          {scene.dialogue?.length > 0 && (
-            <div>
-              <p className="text-[10px] font-black text-[#06b6d4] uppercase tracking-widest mb-2 flex items-center gap-1.5"><Mic size={12}/> Dialogue</p>
-              <div className="space-y-1.5 border-l-2 border-[#06b6d4]/30 pl-3">
-                {scene.dialogue.map((d, i) => (
-                  <p key={i} className="text-sm text-slate-300">
-                    <span className="text-[#06b6d4] font-bold">{d.character}:</span> "{d.text}"
-                  </p>
-                ))}
-              </div>
-            </div>
-          )}
-          <div>
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5"><ImageIcon size={12}/> Visual Prompt</p>
-            <p className="text-slate-400 text-sm italic leading-relaxed bg-[#111] p-3 rounded-lg border border-[#222]">{scene.visualPrompt}</p>
-          </div>
-          {scene.soundEffects?.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-1">
-              {scene.soundEffects.map((sfx, i) => (
-                <span key={i} className="px-3 py-1 rounded-full bg-[#111] border border-[#333] text-xs text-slate-300 font-medium flex items-center gap-1.5 shadow-sm">
-                  <span className="text-[#06b6d4]">🔊</span> {sfx}
-                </span>
-              ))}
-            </div>
-          )}
-          {scene.musicMood && (
-            <div className="flex items-center gap-2 pt-1">
-              <div className="w-6 h-6 rounded-full bg-[#06b6d4]/10 flex items-center justify-center">
-                <Music size={12} className="text-[#06b6d4]" />
-              </div>
-              <span className="text-xs text-slate-500 font-medium">Music Track: <span className="text-slate-300">{scene.musicMood}</span></span>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function ProgressStep({ step, status, isCurrent }) {
   const Icon = step.icon;
@@ -249,10 +150,6 @@ export default function AiVideoPage() {
   const [isGeneratingStory, setIsGeneratingStory] = useState(false);
   const [story, setStory] = useState(null);
   const [projectId, setProjectId] = useState(null);
-  const [isStartingGeneration, setIsStartingGeneration] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [editJson, setEditJson] = useState("");
-  const [editJsonError, setEditJsonError] = useState("");
   const [statusData, setStatusData] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
   const pollRef = useRef(null);
@@ -293,36 +190,7 @@ export default function AiVideoPage() {
     }
   };
 
-  // ── Start Video Generation ─────────────────────────────────
 
-  const handleStartGeneration = async () => {
-    setIsStartingGeneration(true);
-    try {
-      let storyToUse = story;
-      if (editMode && editJson) {
-        try {
-          storyToUse = JSON.parse(editJson);
-        } catch {
-          toast.error("Story JSON is invalid. Please fix it before generating.");
-          setIsStartingGeneration(false);
-          return;
-        }
-      }
-
-      const res = await startVideoGeneration(projectId, JSON.stringify(storyToUse), formData.autoUploadToYouTube);
-      if (res.data.success) {
-        setStage("progress");
-        setStatusData({ status: "GENERATING_STORY", progress: 5, progressLabel: "Starting..." });
-        toast.success("Video generation started! This may take a few minutes.");
-        startPolling(projectId);
-      }
-    } catch (err) {
-      const msg = err.response?.data?.message || "Failed to start generation.";
-      toast.error(msg);
-    } finally {
-      setIsStartingGeneration(false);
-    }
-  };
 
   // ── Status Polling ─────────────────────────────────────────
 
@@ -367,30 +235,11 @@ export default function AiVideoPage() {
     };
   }, []);
 
-  // ── Edit mode ──────────────────────────────────────────────
 
-  const handleToggleEdit = () => {
-    if (!editMode) {
-      setEditJson(JSON.stringify(story, null, 2));
-      setEditJsonError("");
-    } else {
-      try {
-        const parsed = JSON.parse(editJson);
-        setStory(parsed);
-        setEditJsonError("");
-        toast.success("Story updated!");
-      } catch {
-        setEditJsonError("Invalid JSON. Fix it before saving.");
-        return;
-      }
-    }
-    setEditMode(!editMode);
-  };
 
   const handleRegenerate = () => {
     setStory(null);
     setProjectId(null);
-    setEditMode(false);
     setStage("form");
   };
 
@@ -440,26 +289,20 @@ export default function AiVideoPage() {
           <h1 className="text-5xl md:text-6xl font-black text-white leading-[1.1] tracking-tight mb-3">
             AI <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500">Cinematic Studio</span>
           </h1>
-          {/* <p className="text-slate-400 text-lg md:text-xl max-w-xl font-light">
-            Instantly turn your ideas into fully narrated, cinematic short videos.
-          </p> */}
 
           {/* Stage indicator */}
           <div className="flex flex-wrap items-center gap-3 mt-10">
-            {["Story Idea", "Review & Edit", "Generation", "YouTube Upload"].map((s, i) => {
+            {["Story Idea", "Generation", "YouTube Upload"].map((s, i) => {
               let isActive = false;
               let isDone = false;
               
               if (i === 0) { // Story Idea
                 isActive = stage === "form";
                 isDone = stage !== "form";
-              } else if (i === 1) { // Review & Edit
-                isActive = stage === "preview";
-                isDone = stage === "progress" || stage === "youtube";
-              } else if (i === 2) { // Generation
+              } else if (i === 1) { // Generation
                 isActive = stage === "progress";
                 isDone = stage === "youtube";
-              } else if (i === 3) { // YouTube Upload
+              } else if (i === 2) { // YouTube Upload
                 isActive = stage === "youtube" && statusData?.youtubeStatus !== "COMPLETED";
                 isDone = stage === "youtube" && statusData?.youtubeStatus === "COMPLETED";
               }
@@ -474,7 +317,7 @@ export default function AiVideoPage() {
                     {isDone ? <CheckCircle2 size={14} className="text-emerald-400" /> : <span className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] ${isActive ? "bg-cyan-500 text-black" : "bg-[#2a2a2a] text-slate-400"}`}>{i + 1}</span>}
                     {s}
                   </div>
-                  {i < 3 && <ChevronRight size={16} className="text-[#333]" />}
+                  {i < 2 && <ChevronRight size={16} className="text-[#333]" />}
                 </div>
               );
             })}
@@ -628,113 +471,7 @@ export default function AiVideoPage() {
           </div>
         )}
 
-        {/* ═══════════════════════════════════════════════
-            STAGE 2 — STORY PREVIEW
-        ════════════════════════════════════════════════ */}
-        {stage === "preview" && story && (
-          <div className="grid lg:grid-cols-12 gap-6 fade-up">
-            
-            {/* Left Column: Details & Actions */}
-            <div className="lg:col-span-4 flex flex-col gap-4">
-              
-              {/* Story Header */}
-              <div className="glass-card p-6 flex-1 flex flex-col hover:border-[#06b6d4]/30 transition-colors duration-500">
-                <div className="flex items-center gap-2 mb-3">
-                  <Clapperboard size={16} className="text-[#06b6d4]" />
-                  <span className="text-xs font-bold text-[#06b6d4] uppercase tracking-widest">Story Details</span>
-                </div>
-                <h2 className="text-xl font-extrabold text-white mb-2">{story.title}</h2>
-                <p className="text-slate-400 text-sm leading-relaxed mb-6 flex-1">{story.description}</p>
-                
-                {/* Stats */}
-                <div className="space-y-2 mt-auto">
-                  <div className="flex justify-between items-center px-3 py-2 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a]">
-                    <span className="text-xs text-slate-500">Duration</span>
-                    <span className="text-xs text-slate-200 font-medium flex items-center gap-1.5"><Clock size={12}/> {story.duration}s</span>
-                  </div>
-                  <div className="flex justify-between items-center px-3 py-2 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a]">
-                    <span className="text-xs text-slate-500">Scenes</span>
-                    <span className="text-xs text-slate-200 font-medium">{story.scenes?.length || 0}</span>
-                  </div>
-                  <div className="flex justify-between items-center px-3 py-2 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a]">
-                    <span className="text-xs text-slate-500">Language</span>
-                    <span className="text-xs text-slate-200 font-medium">{story.language}</span>
-                  </div>
-                </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col gap-2">
-                <div className="grid grid-cols-2 gap-2">
-                  <OutlineButton onClick={handleRegenerate} className="w-full text-[11px] px-2 py-3">
-                    <RefreshCw size={14} />
-                    Regenerate
-                  </OutlineButton>
-                  <OutlineButton onClick={handleToggleEdit} className="w-full text-[11px] px-2 py-3">
-                    <Edit3 size={14} />
-                    {editMode ? "Cancel" : "Edit JSON"}
-                  </OutlineButton>
-                </div>
-                <PrimaryButton
-                  id="generate-video-btn"
-                  onClick={handleStartGeneration}
-                  loading={isStartingGeneration}
-                  className="w-full py-3.5"
-                >
-                  {!isStartingGeneration && <Film size={15} />}
-                  Generate Video
-                </PrimaryButton>
-              </div>
-            </div>
-
-            {/* Right Column: Scenes / Editor */}
-            <div className="lg:col-span-8 flex flex-col">
-              {editMode ? (
-                <div className="glass-card p-6 h-full flex flex-col hover:border-[#06b6d4]/30 transition-colors duration-500">
-                  <div className="flex items-center justify-between mb-4">
-                    <SectionLabel>Edit Story JSON</SectionLabel>
-                    <button
-                      onClick={() => { setEditMode(false); setEditJsonError(""); }}
-                      className="text-slate-500 hover:text-white transition-colors p-1 bg-[#1a1a1a] rounded-md border border-[#333]"
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                  <textarea
-                    value={editJson}
-                    onChange={(e) => { setEditJson(e.target.value); setEditJsonError(""); }}
-                    className="w-full flex-1 bg-[#0a0a0a]/80 border border-[#2a2a2a] rounded-xl px-4 py-4 text-emerald-400 font-mono text-xs sm:text-sm focus:outline-none focus:border-[#06b6d4]/50 resize-none shadow-inner min-h-[400px]"
-                    spellCheck={false}
-                  />
-                  {editJsonError && (
-                    <p className="text-red-400 text-xs mt-3 flex items-center gap-1.5 bg-red-500/10 p-2 rounded-lg border border-red-500/20">
-                      <AlertCircle size={14} /> {editJsonError}
-                    </p>
-                  )}
-                  <div className="flex justify-end mt-4">
-                    <PrimaryButton onClick={handleToggleEdit}>
-                      Save Changes
-                    </PrimaryButton>
-                  </div>
-                </div>
-              ) : (
-                <div className="glass-card p-6 h-full flex flex-col hover:border-[#06b6d4]/30 transition-colors duration-500">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
-                    <SectionLabel>Scene Breakdown</SectionLabel>
-                    <span className="text-[10px] sm:text-xs text-slate-500 px-2 py-1.5 bg-[#1a1a1a] rounded-md border border-[#333] font-medium tracking-wide">
-                      {story.scenes?.length} scenes • click to expand
-                    </span>
-                  </div>
-                  <div className="space-y-3 pr-2 custom-scrollbar flex-1 h-[500px] overflow-y-auto">
-                    {story.scenes?.map((scene, i) => (
-                      <SceneCard key={i} scene={scene} index={i} />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* ═══════════════════════════════════════════════
             STAGE 3 — PROGRESS + RESULT
