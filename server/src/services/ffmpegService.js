@@ -24,6 +24,8 @@ if (ffprobeInstaller?.path) {
 
 const NARRATION_VOLUME = 1.0;
 const MUSIC_VOLUME = 0.2;
+// const SFX_VOLUME = 0.4;
+
 
 /**
  * Run FFmpeg with a promise wrapper
