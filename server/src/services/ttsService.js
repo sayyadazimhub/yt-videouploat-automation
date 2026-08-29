@@ -119,74 +119,95 @@ const generateSingleAudio = async (segment, outputPath, voiceName) => {
         return createSilentAudio(outputPath, 1);
     }
 
-    return new Promise(async (resolve, reject) => {
-        console.log(`🎙️  TTS (Edge Neural): "${text.substring(0, 40)}..." (${voiceName})`);
+    let attempts = 0;
+    const maxAttempts = 3;
 
-        let handled = false;
-        let writeStream = null;
-        const timer = setTimeout(() => {
-            if (!handled) {
-                handled = true;
-                console.warn("⚠️  TTS (Edge) timed out after 30s. Falling back to silent audio.");
-                if (writeStream && !writeStream.destroyed) writeStream.destroy();
-                createSilentAudio(outputPath).then(resolve).catch(reject);
-            }
-        }, 30000);
-
+    while (attempts < maxAttempts) {
+        attempts++;
         try {
-            const tts = new MsEdgeTTS();
-            await tts.setMetadata(voiceName, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
-            
-            if (handled) return;
+            await new Promise((resolve, reject) => {
+                if (attempts === 1) {
+                    console.log(`🎙️  TTS (Edge Neural): "${text.substring(0, 40)}..." (${voiceName})`);
+                } else {
+                    console.log(`🎙️  TTS Retry ${attempts}/${maxAttempts}: "${text.substring(0, 40)}..."`);
+                }
 
-            // Apply SSML approximation for delivery parameters
-            const { rate, pitch, volume } = mapDeliveryToSSML(delivery);
-            let finalText = text;
-            
-            const hasVocalCues = delivery?.vocalCues?.length > 0;
-            if (hasVocalCues) {
-                const cueString = delivery.vocalCues.join(", ").replace(/_/g, " ");
-                console.log(`   🎭 Vocal Cues: [${cueString}] (Simulated via pauses)`);
-                // Simulate pauses for cues like "nervous_breath" or "sigh"
-                finalText = `... ${finalText} ...`;
+                let handled = false;
+                let writeStream = null;
+                const timer = setTimeout(() => {
+                    if (!handled) {
+                        handled = true;
+                        if (writeStream && !writeStream.destroyed) writeStream.destroy();
+                        reject(new Error("Timeout"));
+                    }
+                }, 30000);
+
+                try {
+                    const tts = new MsEdgeTTS();
+                    tts.setMetadata(voiceName, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3).then(() => {
+                        if (handled) return;
+
+                        // Apply SSML approximation for delivery parameters
+                        const { rate, pitch, volume } = mapDeliveryToSSML(delivery);
+                        let finalText = text;
+                        
+                        const hasVocalCues = delivery?.vocalCues?.length > 0;
+                        if (hasVocalCues) {
+                            if (attempts === 1) {
+                                const cueString = delivery.vocalCues.join(", ").replace(/_/g, " ");
+                                console.log(`   🎭 Vocal Cues: [${cueString}] (Simulated via pauses)`);
+                            }
+                            finalText = `... ${finalText} ...`;
+                        }
+
+                        const { audioStream } = tts.toStream(finalText);
+                        const dir = path.dirname(outputPath);
+                        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+                        
+                        writeStream = fs.createWriteStream(outputPath);
+                        audioStream.pipe(writeStream);
+                        
+                        audioStream.on('end', () => {
+                            if (handled) return;
+                            handled = true;
+                            clearTimeout(timer);
+                            resolve();
+                        });
+
+                        audioStream.on('error', (err) => {
+                            if (handled) return;
+                            handled = true;
+                            clearTimeout(timer);
+                            if (writeStream && !writeStream.destroyed) writeStream.destroy();
+                            reject(err);
+                        });
+                    }).catch(err => {
+                        if (handled) return;
+                        handled = true;
+                        clearTimeout(timer);
+                        reject(err);
+                    });
+
+                } catch (error) {
+                    if (handled) return;
+                    handled = true;
+                    clearTimeout(timer);
+                    if (writeStream && !writeStream.destroyed) writeStream.destroy();
+                    reject(error);
+                }
+            });
+            // If Promise resolves, we are done
+            return;
+        } catch (err) {
+            console.error(`❌ TTS Stream Error (Attempt ${attempts}):`, err.message);
+            if (attempts >= maxAttempts) {
+                console.warn("⚠️  Falling back to silent audio after max retries");
+                return createSilentAudio(outputPath);
             }
-
-            // Note: msedge-tts escapes raw SSML tags, causing silent output or reading XML tags.
-            // We rely on the natural punctuation and pauses for Edge TTS.
-            const { audioStream } = tts.toStream(finalText);
-            const dir = path.dirname(outputPath);
-            if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-            
-            writeStream = fs.createWriteStream(outputPath);
-            
-            audioStream.pipe(writeStream);
-            
-            audioStream.on('end', () => {
-                if (handled) return;
-                handled = true;
-                clearTimeout(timer);
-                resolve();
-            });
-
-            audioStream.on('error', (err) => {
-                if (handled) return;
-                handled = true;
-                clearTimeout(timer);
-                console.error(`❌ TTS Stream Error:`, err);
-                if (writeStream && !writeStream.destroyed) writeStream.destroy();
-                createSilentAudio(outputPath).then(resolve).catch(reject);
-            });
-
-        } catch (error) {
-            console.error("❌ Edge TTS Connection Error:", error.message);
-            if (handled) return;
-            handled = true;
-            clearTimeout(timer);
-            if (writeStream && !writeStream.destroyed) writeStream.destroy();
-            console.warn("⚠️  Falling back to silent audio");
-            createSilentAudio(outputPath).then(resolve).catch(reject);
+            // Wait 2 seconds before retrying
+            await new Promise(r => setTimeout(r, 2000));
         }
-    });
+    }
 };
 
 /**

@@ -59,22 +59,15 @@ export const uploadVideo = async (refreshToken, videoPath, metadata) => {
     const fileSize = fs.statSync(videoPath).size;
     
     const res = await youtube.videos.insert({
-        part: ["snippet", "status", "recordingDetails"],
+        part: "snippet,status,recordingDetails",
         requestBody: {
             snippet: {
-                title: metadata.title,
-                description: metadata.description,
-                tags: metadata.tags,
+                title: metadata.title ? (metadata.title.length > 95 ? metadata.title.substring(0, 95) + "..." : metadata.title) : "AI Generated Short",
+                description: metadata.description ? metadata.description.substring(0, 4900) : "",
+                tags: metadata.tags ? metadata.tags.slice(0, 15) : [], // Limit number of tags to avoid 500 char limit
             },
             status: {
                 privacyStatus: metadata.privacyStatus || "public",
-            },
-            recordingDetails: {
-                locationDescription: "Maharashtra, India",
-                location: {
-                    latitude: 19.7515,
-                    longitude: 75.7139
-                }
             }
         },
         media: {

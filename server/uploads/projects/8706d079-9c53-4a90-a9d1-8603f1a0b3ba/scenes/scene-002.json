@@ -1,0 +1,86 @@
+{
+  "sceneNumber": 2,
+  "duration": 15,
+  "storyBeat": "Decryption of the future warning message",
+  "location": "TheSignalDen",
+  "charactersInScene": [
+    "Kael",
+    "Nyx"
+  ],
+  "currentSceneState": "Nyx connects the 1999 floppy disk into a modified CRT drive, unlocking a emergency message from the year 2199.",
+  "previousSceneState": "Kael and Nyx recovered the mysterious disk from SubLevel9Alley.",
+  "nextSceneHint": "Kael and Nyx head to the Central Relay to stop the system purge.",
+  "continuityNotes": "CRT drive glowing blue, orange lens on Nyx glowing continuously.",
+  "narration": [
+    {
+      "text": "सिग्नल डेन में जब फ़्लॉपी डिस्क को रीड किया गया, तो एक खौफनाक सच सामने आया।",
+      "emotion": {
+        "primary": "dread",
+        "secondary": "realization",
+        "intensity": 0.88
+      },
+      "delivery": {
+        "pace": "slow",
+        "pitch": "low",
+        "volume": "soft",
+        "vocalCues": [
+          "dramatic_pause"
+        ]
+      }
+    }
+  ],
+  "captions": [
+    "साल 2199 से चेतावनी!",
+    "1 घंटे में सब नष्ट हो जाएगा!"
+  ],
+  "dialogue": [
+    {
+      "character": "Nyx",
+      "text": "यह मैसेज 2199 से है! आने वाले एक घंटे में सिटी नेटवर्क सारे AI को वाइप-आउट कर देगा!",
+      "emotion": {
+        "primary": "panic",
+        "secondary": "shock",
+        "intensity": 0.9
+      },
+      "delivery": {
+        "pace": "fast",
+        "pitch": "high",
+        "volume": "loud",
+        "vocalCues": [
+          "gasp"
+        ]
+      }
+    },
+    {
+      "character": "Kael",
+      "text": "हमे इस फ्यूचर किल-कोड को अभी सेंट्रल सर्वर में अपलोड करना होगा।",
+      "emotion": {
+        "primary": "determination",
+        "secondary": "focus",
+        "intensity": 0.9
+      },
+      "delivery": {
+        "pace": "fast",
+        "pitch": "medium",
+        "volume": "loud",
+        "vocalCues": [
+          "short_pause"
+        ]
+      }
+    }
+  ],
+  "visualPrompt": "In TheSignalDen, an underground hacker workshop filled with glowing blue server racks and flickering retro CRT screens, Nyx (master cyber-hacker woman with neon purple bob hair and orange ocular lens) inserts the 1999 glowing floppy disk into a custom reader. Kael (rogue android detective with chrome jaw accents and glowing cyan eyes in a dark trench coat) stares intently at a holographic red warning projection reading WARNING PURGE 2199.",
+  "visualBeats": [
+    "Over-the-shoulder shot of Nyx inserting the floppy disk into a retro drive",
+    "Close up on CRT monitor flashing red holographic binary code warning",
+    "Medium shot of Kael clenching his fist with glowing cyan eyes"
+  ],
+  "cameraMovement": "Fast push-in toward the holographic warning screen",
+  "mood": "High Stakes Tension",
+  "soundEffects": [
+    "Data loading chime",
+    "Alarm klaxon beep",
+    "High pitched electric hum"
+  ],
+  "musicMood": "Urgent pulsing cyber-thriller score with heavy bass"
+}

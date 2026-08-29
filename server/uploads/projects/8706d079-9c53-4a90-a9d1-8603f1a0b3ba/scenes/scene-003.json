@@ -1,0 +1,84 @@
+{
+  "sceneNumber": 3,
+  "duration": 15,
+  "storyBeat": "Confrontation at the Central Relay Core",
+  "location": "CentralRelayCore",
+  "charactersInScene": [
+    "Kael",
+    "Nyx"
+  ],
+  "currentSceneState": "Hostile security droids attack while Kael defends Nyx as she uploads the future override code.",
+  "previousSceneState": "Kael and Nyx learned about the impending AI purge.",
+  "nextSceneHint": "The upload finishes just in time to shut down the rogue defense system.",
+  "continuityNotes": "Red alert sirens flashing in the Central Relay background.",
+  "narration": [
+    {
+      "text": "सेंट्रल रिले पहुँचते ही सुरक्षा ड्रॉइड्स ने उन पर हमला कर दिया!",
+      "emotion": {
+        "primary": "action",
+        "secondary": "excitement",
+        "intensity": 0.95
+      },
+      "delivery": {
+        "pace": "fast",
+        "pitch": "high",
+        "volume": "loud",
+        "vocalCues": []
+      }
+    }
+  ],
+  "captions": [
+    "सेंट्रल सर्वर पर हमला!",
+    "कोड अपलोड चालू है!"
+  ],
+  "dialogue": [
+    {
+      "character": "Kael",
+      "text": "निक्स, कोड टर्मिनल में लगाओ! मैं इन्हें रोकता हूँ!",
+      "emotion": {
+        "primary": "aggression",
+        "secondary": "bravery",
+        "intensity": 0.95
+      },
+      "delivery": {
+        "pace": "fast",
+        "pitch": "low",
+        "volume": "loud",
+        "vocalCues": [
+          "short_pause"
+        ]
+      }
+    },
+    {
+      "character": "Nyx",
+      "text": "कोड अपलोड हो रहा है... बस ५ सेकंड और!",
+      "emotion": {
+        "primary": "urgency",
+        "secondary": "strain",
+        "intensity": 0.92
+      },
+      "delivery": {
+        "pace": "fast",
+        "pitch": "high",
+        "volume": "loud",
+        "vocalCues": [
+          "nervous_breath"
+        ]
+      }
+    }
+  ],
+  "visualPrompt": "Inside CentralRelayCore, a massive chamber with cylindrical glowing mainframe, Kael (rogue android detective with chrome jaw, cyan glowing eyes, weathered trench coat) fires an energy blaser at approaching dark metallic security droids. Nyx (cyber-hacker woman with purple bob hair) frantically types on a glowing yellow terminal wall interface, inserting the 1999 floppy disk into the override slot.",
+  "visualBeats": [
+    "Dynamic low-angle action shot of Kael firing his blaster rifle",
+    "Extreme close up of Nyx's hands pressing high-tech console keys under red siren lights",
+    "Wide shot of droids advancing across suspended metal walkway towards Kael"
+  ],
+  "cameraMovement": "Dynamic handheld tracking shot following the gunfire and action",
+  "mood": "Action Kinetic",
+  "soundEffects": [
+    "Plasma laser shots",
+    "Robotic footsteps metallic clash",
+    "Progress bar upload tone"
+  ],
+  "musicMood": "Fast-paced synthwave chase with aggressive percussion"
+}

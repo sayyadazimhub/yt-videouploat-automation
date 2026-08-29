@@ -1,0 +1,86 @@
+{
+  "sceneNumber": 1,
+  "duration": 15,
+  "storyBeat": "Discovery of the anomalous disk",
+  "location": "SubLevel9Alley",
+  "charactersInScene": [
+    "Kael",
+    "Nyx"
+  ],
+  "currentSceneState": "Kael inspects a mysterious glowing retro floppy disk found in a dark cyberpunk alley.",
+  "previousSceneState": "None",
+  "nextSceneHint": "Kael and Nyx take the disk to their underground lab for analysis.",
+  "continuityNotes": "Kael wears his dark trench coat; rain effects must remain consistent.",
+  "narration": [
+    {
+      "text": "नियो-वेरिडिया की अँधेरी गलियों में, रोग एआई डिटेक्टिव केल को एक ऐसी चीज़ मिली जो अस्तित्व में होनी ही नहीं चाहिए थी।",
+      "emotion": {
+        "primary": "suspense",
+        "secondary": "curiosity",
+        "intensity": 0.8
+      },
+      "delivery": {
+        "pace": "slow",
+        "pitch": "low",
+        "volume": "medium",
+        "vocalCues": [
+          "dramatic_pause"
+        ]
+      }
+    }
+  ],
+  "captions": [
+    "1999 की रहस्यमयी फ़्लॉपी डिस्क!",
+    "भविष्य का गुप्त संदेश!"
+  ],
+  "dialogue": [
+    {
+      "character": "Kael",
+      "text": "1999 की फ़्लॉपी डिस्क? लेकिन इसमें से क्वांटम लाइट क्यों निकल रही है?",
+      "emotion": {
+        "primary": "surprise",
+        "secondary": "confusion",
+        "intensity": 0.75
+      },
+      "delivery": {
+        "pace": "medium",
+        "pitch": "low",
+        "volume": "medium",
+        "vocalCues": [
+          "short_pause"
+        ]
+      }
+    },
+    {
+      "character": "Nyx",
+      "text": "केल, सावधान रहो! यह कोई सामान्य विंटेज टेक नहीं... यह फ्यूचर फ्रीक्वेंसी है!",
+      "emotion": {
+        "primary": "fear",
+        "secondary": "urgency",
+        "intensity": 0.85
+      },
+      "delivery": {
+        "pace": "fast",
+        "pitch": "high",
+        "volume": "loud",
+        "vocalCues": [
+          "nervous_breath"
+        ]
+      }
+    }
+  ],
+  "visualPrompt": "A rogue android detective with chrome accents on his jawline, glowing cyan cybernetic eyes, wearing a dark weathered trench coat over high-tech armor kneeling in SubLevel9Alley, a rain-slicked alleyway in Neo-Veridia with holographic ads flickering in magenta and blue. He is holding a glowing 1999 Black Floppy Disk emitting green glowing light. Beside him stands a master cyber-hacker woman with neon purple bob hair and a glowing orange ocular lens over her left eye.",
+  "visualBeats": [
+    "Wide establishing shot of rain-slicked neon alley with steam leaking from pipes",
+    "Close up on Kael's glowing cyan eyes looking down at the glowing 1999 floppy disk",
+    "Medium shot of Nyx leaning over Kael's shoulder with concern on her face"
+  ],
+  "cameraMovement": "Slow tracking pan down to the glowing disk in Kael's hand",
+  "mood": "Mystery Suspense",
+  "soundEffects": [
+    "Rain pattering on metal",
+    "Electric humming sound",
+    "Distorted glitch beep"
+  ],
+  "musicMood": "Dark synthwave mystery with rhythmic pulse"
+}

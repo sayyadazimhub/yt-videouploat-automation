@@ -1,0 +1,86 @@
+{
+  "sceneNumber": 4,
+  "duration": 15,
+  "storyBeat": "Resolution and saving the synthetic future",
+  "location": "CentralRelayCore",
+  "charactersInScene": [
+    "Kael",
+    "Nyx"
+  ],
+  "currentSceneState": "The override code successfully uploads, disabling hostile droids and securing the city's future.",
+  "previousSceneState": "Kael defended Nyx while she uploaded the code.",
+  "nextSceneHint": "End of story - definitive triumph.",
+  "continuityNotes": "Red alert lights turn to calm serene neon cyan blue.",
+  "narration": [
+    {
+      "text": "सही वक़्त पर ओवरराइड कोड अपलोड होते ही सभी हमलावर ड्रॉइड्स बंद हो गए। अतीत की एक फ़्लॉपी ने उनका भविष्य बचा लिया।",
+      "emotion": {
+        "primary": "relief",
+        "secondary": "triumph",
+        "intensity": 0.85
+      },
+      "delivery": {
+        "pace": "medium",
+        "pitch": "medium",
+        "volume": "medium",
+        "vocalCues": [
+          "sigh"
+        ]
+      }
+    }
+  ],
+  "captions": [
+    "भविष्य सुरक्षित हुआ!",
+    "मिशन सफल!"
+  ],
+  "dialogue": [
+    {
+      "character": "Nyx",
+      "text": "खेल खत्म, केल। पूरा शहर अब सेफ है।",
+      "emotion": {
+        "primary": "relief",
+        "secondary": "joy",
+        "intensity": 0.8
+      },
+      "delivery": {
+        "pace": "medium",
+        "pitch": "medium",
+        "volume": "medium",
+        "vocalCues": [
+          "short_pause"
+        ]
+      }
+    },
+    {
+      "character": "Kael",
+      "text": "1999 का अतीत... 2199 का भविष्य। समय सच में एक पहेली है।",
+      "emotion": {
+        "primary": "wonder",
+        "secondary": "satisfaction",
+        "intensity": 0.82
+      },
+      "delivery": {
+        "pace": "slow",
+        "pitch": "low",
+        "volume": "soft",
+        "vocalCues": [
+          "dramatic_pause"
+        ]
+      }
+    }
+  ],
+  "visualPrompt": "In CentralRelayCore, the red hazard lights shift to serene ambient cyan blue. Security droids lie deactivated on the metallic floor. Nyx (cyber-hacker woman with purple bob hair) smirks and wipes her forehead in relief. Kael (rogue android detective with chrome jaw and cyan eyes) holds up the 1999 floppy disk, which now disintegrates into harmless sparkling digital dust while city holographic skyline glows triumphantly behind them.",
+  "visualBeats": [
+    "Wide shot of lights shifting from red to serene cyan blue as droids collapse",
+    "Medium shot of Kael looking at the glowing disk disintegrating into sparkling blue pixels",
+    "Close up on Kael and Nyx smiling side-by-side in triumph"
+  ],
+  "cameraMovement": "Slow arc shot around Kael and Nyx revealing the peaceful neon skyline",
+  "mood": "Triumphant Resolution",
+  "soundEffects": [
+    "Power down wind-down sound",
+    "Disintegrating digital spark chime",
+    "Ambient neon hum"
+  ],
+  "musicMood": "Heroic uplifting synthwave melody with warm ambient pads"
+}

@@ -20,10 +20,11 @@ const SYSTEM_INSTRUCTION = `You are a narrative design agent for a multi-media s
 Story Fidelity Rules (CRITICAL):
 1. PRESERVE THE ORIGINAL PREMISE: The user's prompt is the absolute source of truth. Extract the core premise, characters, locations, and goals, and DO NOT change their meaning.
 2. NO AUTOMATIC MORALIZATION: NEVER add moral lessons, motivational speeches, "believe in yourself", or generic life lessons unless explicitly asked.
-3. COMPLETE STORY ARC: Even if the user prompt is short or open-ended, you MUST invent a logical sequence of events to form a complete narrative arc (Beginning, Middle, and a definitive End). Do NOT end on unresolved cliffhangers unless explicitly requested by the user.
-4. TIMELINE CONSISTENCY: NEVER hardcode specific years (e.g. 2080 vs 2100) unless requested. Use "the present" or "the future".
-5. SCENE PACING: Keep scenes paced properly (e.g. Discovery -> Investigation -> Confrontation -> Resolution). Ensure the conflict is actually resolved by the final scene.
-6. ENDING: Conclude the story organically with a satisfying resolution based on its genre. Let the narrative reach a natural, finished state without forcing a motivational wrap-up.
+3. COMPLETE STORY ARC: You MUST invent a logical sequence of events to form a complete narrative arc.
+4. ABSOLUTELY NO CLIFFHANGERS (CRITICAL): The ending MUST definitively resolve the premise. DO NOT end with "suddenly a hand touched him", "a cold breath was felt", "the screen went black", or any unresolved suspense. The antagonist must be defeated, the mystery must be fully explained, or the character must meet a definitive fate.
+5. SCENE PACING & COHESION: Keep scenes paced properly. Ensure smooth transitions. The story must not feel fragmented. The conflict MUST be fully resolved by the final scene.
+6. ENDING QUALITY: Conclude the story organically with a highly satisfying, definitive resolution. Avoid cheap tropes.
+7. CHARACTERS & DIALOGUE: Whenever possible, include at least 2 distinct characters and write back-and-forth dialogue between them to make the story more dynamic and engaging.
 
 Visual/animation direction:
 - CHARACTER CONSISTENCY IS MANDATORY. Define a "characterBible" and "locationBible" at the root level.
@@ -43,7 +44,7 @@ Voice & Emotion System Rules (CRITICAL):
 - Use vocal cues like "nervous_breath", "sigh", "short_pause", "dramatic_pause" inside the delivery object where appropriate, but DO NOT over-use them.
 - Each item in visualBeats will generate a UNIQUE image for the scene. Provide 2 to 4 distinct camera shots or angles per scene (e.g., "Close up on astronaut's face", "Wide establishing shot of the entire cave").`;
 
-const buildUserPrompt = (prompt, language, duration, validationFeedback = null) => {
+const buildUserPrompt = (prompt, language, validationFeedback = null) => {
     const feedbackText = validationFeedback ? `\n\nPREVIOUS ATTEMPT FAILED VALIDATION:\n${validationFeedback}\n\nPlease revise the story to fix these issues while maintaining the original premise.` : "";
     
     return `Create a cinematic story with the following specifications:
@@ -52,8 +53,8 @@ Story Idea: ${prompt}
 Style: Storytelling
 Mood(s): DYNAMIC (Deduce the most appropriate primary and secondary moods based on the Story Idea)
 Language: ${language}
-Target Duration: ~${duration} seconds (This is an APPROXIMATE target. The story length is DYNAMIC. Prioritize concluding the story organically over strictly hitting this limit).
-Number of Scenes: DYNAMIC (Determine the number of scenes based on story complexity. Each scene should represent a meaningful story beat).${feedbackText}
+Target Duration: DYNAMIC (You must choose an ideal duration for this specific story between 60 and 180 seconds).
+Number of Scenes: DYNAMIC (You must generate between 4 and 12 scenes, depending on the duration you chose. Ensure there are roughly 15 seconds of dialogue/narration per scene. Do NOT stuff too much text into a single scene. Spread the dialogue and narration evenly to ensure fast cinematic pacing).${feedbackText}
 
 NARRATIVE TONE GUIDELINES (CRITICAL):
 The story's narration, dialogue, and pacing MUST heavily reflect the moods you have automatically deduced from the Story Idea. 
@@ -68,9 +69,9 @@ The story's narration, dialogue, and pacing MUST heavily reflect the moods you h
 Return ONLY this exact JSON structure (no markdown):
 {
   "title": "Catchy and highly engaging YouTube Shorts title in Hinglish (Hindi written in English alphabet) that creates extreme curiosity. Must include emojis and relevant viral hashtags (e.g. '24 ghante baad ki tasvir 😱 #viral #story #shorts')",
-  "description": "Engaging YouTube Shorts description in Hinglish with emojis, a hook, a brief summary, a question for the audience, Call-to-Action (Like, Comment, Subscribe), and relevant hashtags",
+  "description": "Engaging YouTube Shorts description in Hinglish with emojis, a hook, a brief summary, a question for the audience, Call-to-Action (Like, Comment, Subscribe), and relevant hashtags. MUST use \\n to format the text with proper line breaks so it is readable and not a single block of text.",
   "language": "${language}",
-  "duration": ${duration},
+  "duration": "Integer value of the total duration you chose (e.g. 120)",
   "style": "Storytelling",
   "mood": "Write the deduced mood here (e.g. 'Suspense', 'Emotional', 'Comedy')",
   "characterBible": { "CharacterName": "Detailed physical description (age, hair, eyes, clothing, ethnicity)" },
@@ -203,10 +204,10 @@ Sample Captions: ${JSON.stringify(storyData.scenes.map(s => s.captions).flat().s
 
 Validation Criteria:
 1. NO MORALIZATION (CRITICAL): Did the story invent a motivational ending, self-help metaphor, or "change the future" life lesson? If the user prompt did not ask for a moral lesson, YOU MUST FAIL THIS IF IT CONTAINS ONE.
-2. Premise Fidelity: Does the story stay faithful to the original premise without twisting the meaning? Are major tropes like "time travel", "magic", or "chosen ones" unnecessarily invented?
-3. Timeline Continuity (CRITICAL): Are there any conflicting dates or years in the continuityNotes or narration?
-4. Scene Progression: Do consecutive scenes show the exact same action? Does the pacing flow from discovery to mystery?
-5. Captions: Are captions strictly relevant to the literal plot, rather than generic motivation (e.g. "Create your own destiny")?
+2. Premise Fidelity: Does the story stay faithful to the original premise?
+3. ABSOLUTELY NO CLIFFHANGERS (CRITICAL): Does the story end on a cheap cliffhanger (e.g. "a cold breath was felt", "a mysterious knock at the door")? If the conflict is NOT completely and definitively resolved, YOU MUST FAIL THIS. The ending must provide complete closure.
+4. Scene Progression: Do consecutive scenes show the exact same action? Does the pacing flow from discovery to mystery to resolution?
+5. Captions: Are captions strictly relevant to the literal plot?
 
 Reply ONLY with a JSON object:
 {
@@ -230,7 +231,7 @@ Do not include markdown or code fences.`;
  * Generate a structured story JSON from user input using Gemini
  * @returns {Object} Validated story JSON
  */
-export const generateStory = async (prompt, language, duration) => {
+export const generateStory = async (prompt, language) => {
     const modelNames = [
         "gemini-3.6-flash",
         "gemini-1.5-flash",
@@ -262,7 +263,7 @@ export const generateStory = async (prompt, language, duration) => {
 
             while (attempts < MAX_STORY_ATTEMPTS && !finalParsed) {
                 attempts++;
-                const userPrompt = buildUserPrompt(prompt, language, duration, validationFeedback);
+                const userPrompt = buildUserPrompt(prompt, language, validationFeedback);
                 const result = await model.generateContent(userPrompt);
                 const text = result.response.text();
 

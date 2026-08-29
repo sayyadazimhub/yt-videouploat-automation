@@ -16,8 +16,10 @@ import {
     getSubScenePaths,
     getFinalVideoPath,
     getMusicPath,
-    fileExists,
+    getFinalVideoUrl,
     deleteProjectFiles,
+    fileSizeValid,
+    fileExists,
 } from "./fileService.js";
 import { uploadToCloudinary } from "./cloudinaryService.js";
 import { unlinkSync, renameSync, existsSync } from "fs";
@@ -114,17 +116,21 @@ export const runVideoPipeline = async (projectId, storyData) => {
             }
         }
 
-        // ── STEP 3: Generate TTS audio for each scene concurrently
+        // ── STEP 3: Generate TTS audio for each scene sequentially
         await updateStatus(projectId, "GENERATING_AUDIO", 30, "Generating voice narration...");
         let completedAudio = 0;
 
-        const audioPromises = scenes.map(async (scene, i) => {
+        for (let i = 0; i < scenes.length; i++) {
+            const scene = scenes[i];
             const paths = getScenePaths(projectId, scene.sceneNumber);
+            
             if (fileExists(paths.audio)) {
                 console.log(`⏭️  Skipping audio for scene ${scene.sceneNumber} (already exists)`);
             } else {
                 try {
                     await generateSceneAudio(scene, paths.audio, language, storyData);
+                    // Add a small 1-second delay between sequential requests to respect TTS limits
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                 } catch (audioErr) {
                     console.error(`❌ Audio gen failed for scene ${scene.sceneNumber}: ${audioErr.message}`);
                     throw new Error(`Failed to generate audio for scene ${scene.sceneNumber}`);
@@ -134,22 +140,21 @@ export const runVideoPipeline = async (projectId, storyData) => {
             completedAudio++;
             const audioProgress = 30 + Math.round((completedAudio / scenes.length) * 20); // 30 to 50
             await updateStatus(projectId, "GENERATING_AUDIO", audioProgress, `Generating audio: ${completedAudio}/${scenes.length}`);
-        });
-
-        await Promise.all(audioPromises);
+        }
 
         // ── STEP 4: Create per-scene video clips concurrently
         await updateStatus(projectId, "GENERATING_VIDEO", 50, "Creating scene videos...");
         let completedVideos = 0;
 
-        const videoPromises = scenes.map(async (scene, i) => {
+        for (let i = 0; i < scenes.length; i++) {
+            const scene = scenes[i];
             const paths = getScenePaths(projectId, scene.sceneNumber);
             const numBeats = scene.visualBeats?.length || 1;
             let duration = scene.duration || 15;
 
-            // Verify audio exists
-            if (!fileExists(paths.audio)) {
-                throw new Error(`Audio missing for scene ${scene.sceneNumber}`);
+            // Verify audio exists and is valid
+            if (!fileSizeValid(paths.audio)) {
+                throw new Error(`Audio missing or corrupted (0 bytes) for scene ${scene.sceneNumber}`);
             }
 
             // Dynamically adjust total duration to strictly match audio length
@@ -185,12 +190,16 @@ export const runVideoPipeline = async (projectId, storyData) => {
 
                     // Concatenate all silent chunks into one video_only file
                     await concatenateSceneVideos(chunkPaths, paths.videoOnly);
+                    chunkPaths.push(paths.videoOnly);
 
                     // Mux the full scene audio onto the concatenated video
                     await muxAudio(paths.videoOnly, paths.audio, paths.video, duration);
 
+                } catch (videoErr) {
+                    console.error(`❌ Scene video failed for scene ${scene.sceneNumber}: ${videoErr.message}`);
+                    throw new Error(`Failed to create video for scene ${scene.sceneNumber}`);
+                } finally {
                     // Cleanup chunks and videoOnly
-                    chunkPaths.push(paths.videoOnly);
                     chunkPaths.forEach(p => {
                         try {
                             if (fileExists(p)) unlinkSync(p);
@@ -198,22 +207,15 @@ export const runVideoPipeline = async (projectId, storyData) => {
                             console.warn(`⚠️ Could not delete temp file ${p}: ${e.message}`);
                         }
                     });
-
-                } catch (videoErr) {
-                    console.error(`❌ Scene video failed for scene ${scene.sceneNumber}: ${videoErr.message}`);
-                    throw new Error(`Failed to create video for scene ${scene.sceneNumber}`);
                 }
             }
+            
+            sceneVideoPaths.push(paths.video);
             
             completedVideos++;
             const videoProgress = 50 + Math.round((completedVideos / scenes.length) * 25); // 50 to 75
             await updateStatus(projectId, "GENERATING_VIDEO", videoProgress, `Creating scene videos: ${completedVideos}/${scenes.length}`);
-            
-            return paths.video; // Return path so we can maintain order
-        });
-
-        // Resolve all video creations concurrently and keep the paths ordered
-        sceneVideoPaths = await Promise.all(videoPromises);
+        }
 
         if (sceneVideoPaths.length === 0) {
             throw new Error("No scene videos were created. Check FFmpeg installation and source files.");
@@ -368,5 +370,10 @@ export const runVideoPipeline = async (projectId, storyData) => {
             "Generation failed",
             err.message
         );
+        // Clean up local files on failure to prevent disk space leaks
+        try {
+            deleteProjectFiles(projectId);
+            console.log(`🧹 Cleaned up local files for failed project ${projectId}`);
+        } catch (_) {}
     }
 };

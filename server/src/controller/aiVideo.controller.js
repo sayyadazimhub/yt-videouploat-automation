@@ -20,19 +20,18 @@ export const generateStoryController = async (req, res) => {
         }
 
         const validLanguages = ["English", "Hindi", "Marathi"];
-        const validDurations = [30, 60, 120, 180];
 
         const storyLanguage = validLanguages.includes(language) ? language : "English";
-        const storyDuration = validDurations.includes(Number(duration)) ? Number(duration) : 60;
 
         console.log(`\n🎬 Story generation request: "${prompt.substring(0, 50)}..."`);
 
-        // Generate story via Gemini
+        // Generate story via Gemini (LLM chooses the duration dynamically)
         const storyData = await generateStory(
             prompt.trim(),
-            storyLanguage,
-            storyDuration
+            storyLanguage
         );
+        
+        const storyDuration = storyData.duration || 60;
 
         // Create project in DB (no video generation yet)
         const projectId = generateProjectId();

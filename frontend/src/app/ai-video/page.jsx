@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import toast from "react-hot-toast";
 import {
   generateStory,
@@ -135,6 +135,126 @@ function ProgressStep({ step, status, isCurrent }) {
     </div>
   );
 }
+
+const StoryForm = React.memo(({ formData, setFormData, isGeneratingStory, handleGenerateStory }) => {
+  return (
+    <div className="space-y-8 fade-up">
+      {/* Form Split Layout */}
+      <div className="grid lg:grid-cols-12 gap-6">
+        
+        {/* Left Column: Story Idea */}
+        <div className="lg:col-span-8 flex flex-col">
+          <div className="glass-card p-8 hover:border-[#06b6d4]/30 transition-colors duration-500 group flex flex-col h-full">
+            <SectionLabel>Story Idea <span className="text-[#06b6d4]">*</span></SectionLabel>
+            <textarea
+              id="story-prompt"
+              value={formData.prompt}
+              onChange={(e) => setFormData({ ...formData, prompt: e.target.value })}
+              placeholder='e.g. "A story about criminality in a cinematic way. Add suspense, drama, fun, and unexpected twists."'
+              className="w-full flex-1 min-h-[250px] bg-[#0a0a0a]/50 border border-[#333] rounded-2xl px-5 py-4 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-[#06b6d4]/60 focus:ring-4 focus:ring-[#06b6d4]/10 transition-all duration-300 resize-none text-lg leading-relaxed group-hover:bg-[#0a0a0a]/80 shadow-inner"
+            />
+            <div className="flex justify-between items-center mt-4">
+              <p className="text-slate-500 text-xs font-medium">{formData.prompt.length} characters (minimum 10)</p>
+              {formData.prompt.length >= 10 && <CheckCircle2 size={16} className="text-emerald-500" />}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Configuration Column */}
+        <div className="lg:col-span-4 flex flex-col gap-4">
+          
+          {/* Language */}
+          <div className="glass-card p-5 hover:border-[#06b6d4]/30 transition-colors duration-500">
+            <SectionLabel>Language</SectionLabel>
+            <div className="grid grid-cols-3 gap-2 mt-2">
+              {LANGUAGES.map((l) => (
+                <button
+                  key={l}
+                  id={`lang-${l.toLowerCase()}`}
+                  onClick={() => setFormData({ ...formData, language: l })}
+                  className={`px-2 py-2.5 rounded-xl text-xs font-bold border transition-all duration-300 text-center relative overflow-hidden ${
+                    formData.language === l
+                      ? "bg-[#06b6d4]/10 border-[#06b6d4] text-[#06b6d4] shadow-[0_0_15px_rgba(6,182,212,0.15)] scale-[1.02]"
+                      : "bg-[#111] border-[#333] text-slate-400 hover:border-[#555] hover:text-slate-200 hover:bg-[#1a1a1a]"
+                  }`}
+                >
+                  {formData.language === l && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#06b6d4]/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />}
+                  <span className="relative z-10">{l}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Video Format */}
+          <div className="glass-card p-5 hover:border-[#06b6d4]/30 transition-colors duration-500">
+            <SectionLabel>Format</SectionLabel>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              {FORMATS.map((f) => (
+                <button
+                  key={f.value}
+                  id={`format-${f.value.replace(":", "-")}`}
+                  onClick={() => setFormData({ ...formData, format: f.value })}
+                  className={`px-3 py-2.5 rounded-xl text-xs border transition-all duration-300 flex items-center gap-3 ${
+                    formData.format === f.value
+                      ? "bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_15px_rgba(6,182,212,0.15)] scale-[1.02]"
+                      : "bg-[#111] border-[#333] hover:border-[#555] hover:bg-[#1a1a1a]"
+                  }`}
+                >
+                  <div className={`w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 ${formData.format === f.value ? "bg-[#06b6d4]/20 text-[#06b6d4]" : "bg-[#222] text-slate-500"}`}>
+                    {f.value === "9:16" ? <div className="w-1.5 h-3 border-2 border-current rounded-sm" /> : <div className="w-3 h-1.5 border-2 border-current rounded-sm" />}
+                  </div>
+                  <p className={`font-bold leading-tight ${formData.format === f.value ? "text-[#06b6d4]" : "text-slate-300"}`}>
+                    {f.label}
+                  </p>
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          {/* Auto Upload Toggle */}
+          <div className="glass-card p-5 hover:border-[#06b6d4]/30 transition-colors duration-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <SectionLabel>Auto-Upload to YouTube</SectionLabel>
+                <p className="text-xs text-slate-400 -mt-2">Requires connected account.</p>
+              </div>
+              <button
+                onClick={() => setFormData({ ...formData, autoUploadToYouTube: !formData.autoUploadToYouTube })}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 flex-shrink-0 ${
+                  formData.autoUploadToYouTube ? 'bg-[#06b6d4]' : 'bg-[#333]'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
+                    formData.autoUploadToYouTube ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Generate Button */}
+      <PrimaryButton
+        id="generate-story-btn"
+        onClick={handleGenerateStory}
+        loading={isGeneratingStory}
+        className="w-full py-4 text-base"
+      >
+        {isGeneratingStory ? (
+          "Gemini is writing your story..."
+        ) : (
+          <>
+            <Sparkles size={18} />
+            Generate Story with AI
+          </>
+        )}
+      </PrimaryButton>
+    </div>
+  );
+});
 
 // ── Main Page ────────────────────────────────────────────────────
 
@@ -331,144 +451,12 @@ export default function AiVideoPage() {
             STAGE 1 — FORM
         ════════════════════════════════════════════════ */}
         {stage === "form" && (
-          <div className="space-y-8 fade-up">
-
-            {/* Form Split Layout */}
-            <div className="grid lg:grid-cols-12 gap-6">
-              
-              {/* Left Column: Story Idea */}
-              <div className="lg:col-span-8 flex flex-col">
-                <div className="glass-card p-8 hover:border-[#06b6d4]/30 transition-colors duration-500 group flex flex-col h-full">
-                  <SectionLabel>Story Idea <span className="text-[#06b6d4]">*</span></SectionLabel>
-                  <textarea
-                    id="story-prompt"
-                    value={formData.prompt}
-                    onChange={(e) => setFormData({ ...formData, prompt: e.target.value })}
-                    placeholder='e.g. "A story about criminality in a cinematic way. Add suspense, drama, fun, and unexpected twists."'
-                    className="w-full flex-1 min-h-[250px] bg-[#0a0a0a]/50 border border-[#333] rounded-2xl px-5 py-4 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-[#06b6d4]/60 focus:ring-4 focus:ring-[#06b6d4]/10 transition-all duration-300 resize-none text-lg leading-relaxed group-hover:bg-[#0a0a0a]/80 shadow-inner"
-                  />
-                  <div className="flex justify-between items-center mt-4">
-                    <p className="text-slate-500 text-xs font-medium">{formData.prompt.length} characters (minimum 10)</p>
-                    {formData.prompt.length >= 10 && <CheckCircle2 size={16} className="text-emerald-500" />}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column: Configuration Column */}
-              <div className="lg:col-span-4 flex flex-col gap-4">
-                
-                {/* Language */}
-                <div className="glass-card p-5 hover:border-[#06b6d4]/30 transition-colors duration-500">
-                  <SectionLabel>Language</SectionLabel>
-                  <div className="grid grid-cols-3 gap-2 mt-2">
-                    {LANGUAGES.map((l) => (
-                      <button
-                        key={l}
-                        id={`lang-${l.toLowerCase()}`}
-                        onClick={() => setFormData({ ...formData, language: l })}
-                        className={`px-2 py-2.5 rounded-xl text-xs font-bold border transition-all duration-300 text-center relative overflow-hidden ${
-                          formData.language === l
-                            ? "bg-[#06b6d4]/10 border-[#06b6d4] text-[#06b6d4] shadow-[0_0_15px_rgba(6,182,212,0.15)] scale-[1.02]"
-                            : "bg-[#111] border-[#333] text-slate-400 hover:border-[#555] hover:text-slate-200 hover:bg-[#1a1a1a]"
-                        }`}
-                      >
-                        {formData.language === l && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#06b6d4]/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />}
-                        <span className="relative z-10">{l}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-
-                {/* Duration */}
-                <div className="glass-card p-5 hover:border-[#06b6d4]/30 transition-colors duration-500">
-                  <SectionLabel>Duration</SectionLabel>
-                  <div className="grid grid-cols-3 gap-2 mt-2">
-                    {DURATIONS.map((d) => (
-                      <button
-                        key={d.value}
-                        id={`duration-${d.value}`}
-                        onClick={() => setFormData({ ...formData, duration: d.value })}
-                        className={`px-1 py-2.5 rounded-xl text-[11px] font-bold border transition-all duration-300 flex flex-row items-center justify-center gap-1 ${
-                          formData.duration === d.value
-                            ? "bg-[#06b6d4]/10 border-[#06b6d4] text-[#06b6d4] shadow-[0_0_15px_rgba(6,182,212,0.15)] scale-[1.05]"
-                            : "bg-[#111] border-[#333] text-slate-400 hover:border-[#555] hover:text-slate-200 hover:bg-[#1a1a1a]"
-                        }`}
-                      >
-                        <Clock size={12} className={formData.duration === d.value ? "text-[#06b6d4]" : "text-slate-500"} />
-                        {d.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Video Format */}
-                <div className="glass-card p-5 hover:border-[#06b6d4]/30 transition-colors duration-500">
-                  <SectionLabel>Format</SectionLabel>
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    {FORMATS.map((f) => (
-                      <button
-                        key={f.value}
-                        id={`format-${f.value.replace(":", "-")}`}
-                        onClick={() => setFormData({ ...formData, format: f.value })}
-                        className={`px-3 py-2.5 rounded-xl text-xs border transition-all duration-300 flex items-center gap-3 ${
-                          formData.format === f.value
-                            ? "bg-[#06b6d4]/10 border-[#06b6d4] shadow-[0_0_15px_rgba(6,182,212,0.15)] scale-[1.02]"
-                            : "bg-[#111] border-[#333] hover:border-[#555] hover:bg-[#1a1a1a]"
-                        }`}
-                      >
-                        <div className={`w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 ${formData.format === f.value ? "bg-[#06b6d4]/20 text-[#06b6d4]" : "bg-[#222] text-slate-500"}`}>
-                          {f.value === "9:16" ? <div className="w-1.5 h-3 border-2 border-current rounded-sm" /> : <div className="w-3 h-1.5 border-2 border-current rounded-sm" />}
-                        </div>
-                        <p className={`font-bold leading-tight ${formData.format === f.value ? "text-[#06b6d4]" : "text-slate-300"}`}>
-                          {f.label}
-                        </p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                {/* Auto Upload Toggle */}
-                <div className="glass-card p-5 hover:border-[#06b6d4]/30 transition-colors duration-500">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <SectionLabel>Auto-Upload to YouTube</SectionLabel>
-                      <p className="text-xs text-slate-400 -mt-2">Requires connected account.</p>
-                    </div>
-                    <button
-                      onClick={() => setFormData({ ...formData, autoUploadToYouTube: !formData.autoUploadToYouTube })}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 flex-shrink-0 ${
-                        formData.autoUploadToYouTube ? 'bg-[#06b6d4]' : 'bg-[#333]'
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
-                          formData.autoUploadToYouTube ? 'translate-x-6' : 'translate-x-1'
-                        }`}
-                      />
-                    </button>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            {/* Generate Button */}
-            <PrimaryButton
-              id="generate-story-btn"
-              onClick={handleGenerateStory}
-              loading={isGeneratingStory}
-              className="w-full py-4 text-base"
-            >
-              {isGeneratingStory ? (
-                "Gemini is writing your story..."
-              ) : (
-                <>
-                  <Sparkles size={18} />
-                  Generate Story with AI
-                </>
-              )}
-            </PrimaryButton>
-          </div>
+          <StoryForm
+            formData={formData}
+            setFormData={setFormData}
+            isGeneratingStory={isGeneratingStory}
+            handleGenerateStory={handleGenerateStory}
+          />
         )}
 
 

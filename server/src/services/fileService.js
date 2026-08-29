@@ -77,6 +77,13 @@ export const readJson = (filePath) => {
 
 export const fileExists = (filePath) => fs.existsSync(filePath);
 
+/** Check if file exists and is strictly greater than 0 bytes */
+export const fileSizeValid = (filePath) => {
+    if (!fs.existsSync(filePath)) return false;
+    const stats = fs.statSync(filePath);
+    return stats.size > 0;
+};
+
 /** Delete a project and all its files */
 export const deleteProjectFiles = (projectId) => {
     const projectDir = getProjectDir(projectId);
@@ -105,7 +112,15 @@ export const getMusicPath = (musicMood) => {
         happy: "comedy.mp3",
     };
     const key = (musicMood || "").toLowerCase();
-    const fileName = moodMap[key] || "dramatic.mp3";
+    
+    let fileName = "dramatic.mp3";
+    for (const [moodKey, moodFile] of Object.entries(moodMap)) {
+        if (key.includes(moodKey)) {
+            fileName = moodFile;
+            break;
+        }
+    }
+
     const fullPath = path.join(assetsDir, fileName);
     return fs.existsSync(fullPath) ? fullPath : null;
 };

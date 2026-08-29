@@ -114,9 +114,6 @@ const generateWithPollinations = async (visualPrompt, outputPath, width, height)
 
     console.log(`🎨 Pollinations: Generating image... (${width}x${height})`);
 
-    // Add an initial random jitter (0-5 seconds) to prevent parallel scene requests from hitting the rate limit simultaneously
-    const initialJitter = Math.random() * 5000;
-    await new Promise((r) => setTimeout(r, initialJitter));
 
     let attempt = 1;
     // Retry infinitely with backoff if it fails (No placeholders allowed)
@@ -143,14 +140,18 @@ const generateWithPollinations = async (visualPrompt, outputPath, width, height)
             }
 
             fs.writeFileSync(outputPath, buffer);
-            console.log(`✅ Pollinations: Image saved (${Math.round(buffer.length / 1024)}KB)`);
+            console.log(`✅ Image generated: ${path.basename(outputPath)}`);
             return outputPath;
         } catch (error) {
-            console.error(`❌ Pollinations attempt ${attempt} failed: ${error.message}`);
-            // Cap the maximum delay at 15 seconds so we don't wait forever between tries
-            const delay = Math.min(attempt * 3000, 15000) + Math.random() * 2000;
-            console.log(`⏳ Waiting ${Math.round(delay/1000)}s before retrying Pollinations...`);
-            await new Promise((r) => setTimeout(r, delay));
+            console.warn(`⚠️ Pollinations attempt ${attempt}/10 failed: ${error.message}`);
+            if (attempt >= 10) {
+                console.error(`❌ Pollinations failed after 10 attempts.`);
+                throw new Error("Failed to generate image after 10 attempts");
+            }
+            // Exponential backoff
+            const backoff = Math.min(2000 * Math.pow(1.5, attempt - 1), 15000);
+            console.log(`⏳ Retrying in ${Math.round(backoff / 1000)}s...`);
+            await new Promise((r) => setTimeout(r, backoff));
             attempt++;
         }
     }
