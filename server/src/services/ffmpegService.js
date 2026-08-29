@@ -22,8 +22,8 @@ if (ffprobeInstaller?.path) {
     console.log(`🎬 FFprobe: Using auto-installer path → ${ffprobeInstaller.path}`);
 }
 
-const NARRATION_VOLUME = parseFloat(process.env.NARRATION_VOLUME) || 1.0;
-const MUSIC_VOLUME = parseFloat(process.env.MUSIC_VOLUME) || 0.2;
+const NARRATION_VOLUME = 1.0;
+const MUSIC_VOLUME = 0.2;
 
 /**
  * Run FFmpeg with a promise wrapper
