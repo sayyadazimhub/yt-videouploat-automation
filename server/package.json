@@ -26,6 +26,7 @@
     "mongoose": "^9.9.3",
     "msedge-tts": "^2.0.7",
     "multer": "^2.2.0",
+    "node-cron": "^4.6.0",
     "node-fetch": "^3.3.2",
     "say": "^0.16.0",
     "uuid": "^14.0.1"

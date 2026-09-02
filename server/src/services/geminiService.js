@@ -228,6 +228,26 @@ Do not include markdown or code fences.`;
 };
 
 /**
+ * Generate a random viral story prompt using Gemini
+ * @returns {string} Random prompt
+ */
+export const generateRandomPrompt = async () => {
+    let client;
+    try {
+        client = getClient();
+    } catch (e) {
+        console.error(`⚠️ Gemini client error: ${e.message}.`);
+        throw e;
+    }
+    
+    const model = client.getGenerativeModel({ model: "gemini-3.6-flash" });
+    const prompt = `Give me a single-sentence viral short story prompt about a mysterious historical event, sci-fi concept, or suspenseful thriller theme. It should be highly engaging and suitable for a YouTube short. Return ONLY the prompt, nothing else.`;
+    
+    const result = await model.generateContent(prompt);
+    return result.response.text().trim();
+};
+
+/**
  * Generate a structured story JSON from user input using Gemini
  * @returns {Object} Validated story JSON
  */

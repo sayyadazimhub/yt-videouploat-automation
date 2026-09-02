@@ -7,6 +7,7 @@ import youtubeRoute from "./routes/youtube.route.js";
 import AiVideoProject from "./models/aiVideoProject.model.js";
 import YoutubeAccount from "./models/youtubeAccount.model.js";
 import { runVideoPipeline } from "./services/videoService.js";
+import { initCronJobs } from "./services/cronService.js";
 
 dotenv.config();
 
@@ -61,6 +62,9 @@ dbconnected().then(async () => {
     } catch (err) {
         console.error("❌ Failed to clean up stuck projects:", err);
     }
+    
+    // Initialize scheduled tasks
+    initCronJobs();
 });
 
 if (process.env.NODE_ENV !== "production" && process.env.VERCEL !== "1") {
