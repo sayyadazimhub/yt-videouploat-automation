@@ -20,7 +20,7 @@ export const getAuthUrl = () => {
             "https://www.googleapis.com/auth/youtube.upload",
             "https://www.googleapis.com/auth/youtube.readonly"
         ],
-        prompt: "consent" // ensures we get a refresh token
+        prompt: "consent select_account" // ensures we get a refresh token and force channel selection
     });
 };
 
