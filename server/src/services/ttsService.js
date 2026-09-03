@@ -25,7 +25,7 @@ const CHARACTER_VOICES = {
     },
     Hindi: {
         male: ["hi-IN-MadhurNeural"],
-        female: ["hi-IN-KavyaNeural", "hi-IN-SwaraNeural"]
+        female: ["hi-IN-SwaraNeural"] // Removed KavyaNeural as it was causing stream termination errors
     },
     Marathi: {
         male: ["mr-IN-ManoharNeural"],

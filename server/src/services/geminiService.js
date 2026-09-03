@@ -240,11 +240,45 @@ export const generateRandomPrompt = async () => {
         throw e;
     }
     
-    const model = client.getGenerativeModel({ model: "gemini-3.6-flash" });
+    const modelNames = [
+        "gemini-3.6-flash",
+        "gemini-3.7-flash",
+        "gemini-3.8-flash",
+        "gemini-flash-latest"
+    ];
+
     const prompt = `Give me a single-sentence viral short story prompt about a mysterious historical event, sci-fi concept, or suspenseful thriller theme. It should be highly engaging and suitable for a YouTube short. Return ONLY the prompt, nothing else.`;
     
-    const result = await model.generateContent(prompt);
-    return result.response.text().trim();
+    let lastError;
+
+    for (const modelName of modelNames) {
+        try {
+            console.log(`🤖 Gemini: Trying model "${modelName}" for random prompt...`);
+            const model = client.getGenerativeModel({ model: modelName });
+            
+            let attempts = 0;
+            const MAX_RETRIES = 5;
+            while (attempts < MAX_RETRIES) {
+                try {
+                    attempts++;
+                    const result = await model.generateContent(prompt);
+                    return result.response.text().trim();
+                } catch (error) {
+                    if (error.message.includes("503") && attempts < MAX_RETRIES) {
+                        console.log(`⚠️ Gemini 503 High Demand Error on ${modelName}. Retrying in 5 seconds (Attempt ${attempts}/${MAX_RETRIES})...`);
+                        await new Promise(resolve => setTimeout(resolve, 5000));
+                    } else {
+                        throw error;
+                    }
+                }
+            }
+        } catch (error) {
+            lastError = error;
+            console.error(`❌ Gemini model "${modelName}" failed for random prompt: ${error.message}`);
+        }
+    }
+    
+    throw new Error(`Failed to generate random prompt with Gemini: ${lastError?.message}`);
 };
 
 /**
@@ -254,8 +288,9 @@ export const generateRandomPrompt = async () => {
 export const generateStory = async (prompt, language) => {
     const modelNames = [
         "gemini-3.6-flash",
-        "gemini-1.5-flash",
-        "gemini-1.5-pro"
+        "gemini-3.7-flash",
+        "gemini-3.8-flash",
+        "gemini-flash-latest"
     ];
 
     let client;
@@ -279,29 +314,47 @@ export const generateStory = async (prompt, language) => {
             let validationFeedback = null;
             let finalParsed = null;
             let attempts = 0;
-            const MAX_STORY_ATTEMPTS = 3;
+            const MAX_STORY_ATTEMPTS = 5;
 
             while (attempts < MAX_STORY_ATTEMPTS && !finalParsed) {
                 attempts++;
                 const userPrompt = buildUserPrompt(prompt, language, validationFeedback);
-                const result = await model.generateContent(userPrompt);
-                const text = result.response.text();
-
-                console.log(`✅ Gemini (${modelName}): Raw response received (Attempt ${attempts})`);
-
-                const parsed = extractJson(text);
-                validateStoryJson(parsed);
-
-                // Run semantic validation
-                console.log(`🔍 Validating story fidelity...`);
-                const validationResult = await validateStoryFidelity(client, modelName, prompt, parsed);
                 
-                if (validationResult.isValid) {
-                    console.log(`✅ Story fidelity validation passed.`);
-                    finalParsed = parsed;
-                } else {
-                    console.log(`❌ Story fidelity validation failed: ${validationResult.reason}`);
-                    validationFeedback = validationResult.reason;
+                // Add a 60-second timeout to prevent indefinite hanging on Render
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error("Gemini API request timed out after 60 seconds")), 60000)
+                );
+                
+                try {
+                    const result = await Promise.race([
+                        model.generateContent(userPrompt),
+                        timeoutPromise
+                    ]);
+                    
+                    const text = result.response.text();
+                    console.log(`✅ Gemini (${modelName}): Raw response received (Attempt ${attempts})`);
+
+                    const parsed = extractJson(text);
+                    validateStoryJson(parsed);
+
+                    // Run semantic validation
+                    console.log(`🔍 Validating story fidelity...`);
+                    const validationResult = await validateStoryFidelity(client, modelName, prompt, parsed);
+                    
+                    if (validationResult.isValid) {
+                        console.log(`✅ Story fidelity validation passed.`);
+                        finalParsed = parsed;
+                    } else {
+                        console.log(`❌ Story fidelity validation failed: ${validationResult.reason}`);
+                        validationFeedback = validationResult.reason;
+                    }
+                } catch (error) {
+                    if (error.message.includes("503") && attempts < MAX_STORY_ATTEMPTS) {
+                        console.log(`⚠️ Gemini 503 High Demand Error. Retrying in 5 seconds (Attempt ${attempts}/${MAX_STORY_ATTEMPTS})...`);
+                        await new Promise(resolve => setTimeout(resolve, 5000));
+                    } else {
+                        throw error; // Let the outer catch block handle it
+                    }
                 }
             }
             
