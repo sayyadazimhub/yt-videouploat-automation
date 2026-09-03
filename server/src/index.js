@@ -67,7 +67,10 @@ dbconnected().then(async () => {
     initCronJobs();
 });
 
-if (process.env.NODE_ENV !== "production" && process.env.VERCEL !== "1") {
+const isRender = process.env.RENDER === "true";
+const isLocal = process.env.NODE_ENV !== "production";
+
+if (isRender || isLocal || !process.env.VERCEL) {
     const port = process.env.PORT || 5000;
     app.listen(port, () => {
         console.log(`🚀 Server is running on port ${port}`);
