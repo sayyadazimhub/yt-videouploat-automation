@@ -54,10 +54,10 @@ export const initCronJobs = () => {
     });
 
     // Schedule for 12:15 PM
-    cron.schedule("10 12 * * *", () => runGeneration("12:10 PM"), {
+    cron.schedule("15 12 * * *", () => runGeneration("12:15 PM"), {
         scheduled: true,
         timezone: "Asia/Kolkata"
     });
 
-    console.log("⏳ Cron jobs initialized. Scheduled to run at 10:30 AM and 12:10 PM IST.");
+    console.log("⏳ Cron jobs initialized. Scheduled to run at 10:30 AM and 12:15 PM IST.");
 };
