@@ -6,9 +6,8 @@ import { generateProjectId } from "./fileService.js";
 import AiVideoProject from "../models/aiVideoProject.model.js";
 
 export const initCronJobs = () => {
-    // Schedule to run at 7 AM (07:00) and 7 PM (19:00) daily
-    cron.schedule("0 7,19 * * *", async () => {
-        console.log("⏰ CRON TRIGGERED: Starting automated video generation (7 AM / 7 PM)...");
+    const runGeneration = async (timeLabel) => {
+        console.log(`⏰ CRON TRIGGERED: Starting automated video generation (${timeLabel})...`);
         try {
             // 1. Generate a random idea
             const prompt = await generateRandomPrompt();
@@ -46,10 +45,19 @@ export const initCronJobs = () => {
         } catch (error) {
             console.error(`❌ Cron Job Failed: ${error.message}`);
         }
-    }, {
+    };
+
+    // Schedule for 10:30 AM
+    cron.schedule("30 10 * * *", () => runGeneration("10:30 AM"), {
         scheduled: true,
         timezone: "Asia/Kolkata"
     });
 
-    console.log("⏳ Cron jobs initialized. Scheduled to run at 7:00 AM and 7:00 PM IST.");
+    // Schedule for 10:00 PM
+    cron.schedule("0 22 * * *", () => runGeneration("10:00 PM"), {
+        scheduled: true,
+        timezone: "Asia/Kolkata"
+    });
+
+    console.log("⏳ Cron jobs initialized. Scheduled to run at 10:30 AM and 10:00 PM IST.");
 };
